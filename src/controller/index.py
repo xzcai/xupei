@@ -1,24 +1,34 @@
-from flask import jsonify, request
+import datetime
+
 import data.database.Mongo.test
+from data.model.person import Person
 from src import app
-from src.common.veri import Ver
-from src.model.person import Person
-from util.macro import success_json
+from src.common.verify import Ver
+
+
+@app.route("/time")
+def timetest():
+    print(datetime.datetime.utcnow())
+    return  "ok"
+
 
 @app.route('/test', methods=['get'])
 def test():
     # data1 = request.args.get('test', '123')
-    bool_value = Ver.mail('82148941@qq.com')
-    bool_value2 = Ver.ver_num('11111111')
-    print(bool_value, bool_value2)
-    return bool_value
+    # bool_value = Ver.mail('82148941@qq.com')
+    # bool_value2 = Ver.ver_num('11111111')
+
+    result = Ver(email="121321@asdf.com").begin_check()
+
+    print(result)
+    return '11111111'
 
 
 @app.route("/test<int:number>/<string:name>")
 def test2(number, name):
     print(number, name)
     data.database.Mongo.test.Tes(code='S').save()
-    return 'ok'
+    return 'ok111'
 
 
 @app.route("/user/login", methods=['get'])
@@ -34,5 +44,5 @@ def login():
 def find():
     data11 = data.database.Mongo.test.Tes.objects(code='S')
     for a in data11:
-        print(a.id)
+        print(a.id, a.code)
     return 'ok'
