@@ -1,5 +1,7 @@
-from .extentions import mongo, mysql
+
 from flask import Flask
+
+from data.database.database import mongo, mysql
 
 
 def create_app():
@@ -14,4 +16,4 @@ def create_app():
 
 app = create_app()
 
-from . import active_state
+from . import controller

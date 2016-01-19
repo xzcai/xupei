@@ -6,5 +6,4 @@ SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:benhu_123@222.186.10.29:3306/XuP
 MONGODB_DB = 'xupei'
 MONGODB_HOST = '127.0.0.1'
 MONGODB_PORT = 27017
-dsf='sdf'
 

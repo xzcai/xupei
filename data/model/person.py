@@ -1,6 +1,7 @@
 class Person(object):
     address = '江西'  # 类属性 相当于静态变量
 
+
     def __init__(self, name, gender, birth):
         self.name = name
         self.gender = gender
@@ -15,3 +16,6 @@ class Person(object):
     @classmethod
     def how_many(cls):
         return cls.address
+
+    def __pri(self):
+        pass

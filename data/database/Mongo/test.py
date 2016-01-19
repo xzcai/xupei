@@ -1,7 +1,7 @@
-from bson import objectid
+
 from mongoengine import StringField
 
-from src.extentions import mongo
+from data.database.database import mongo
 from util.macro import code_send_mean
 
 
