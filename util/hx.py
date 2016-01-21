@@ -53,13 +53,17 @@ class HxHelper:
     # 注册环信账户
     @staticmethod
     def create_account(username, password, nickname):
-        token = HxHelper.get_token()
-        JSON_HEADER['Authorization'] = 'Bearer ' + token
-        payload = {'username': username, 'password': password, 'nickname': nickname}
-        result = requests.post(HxHelper.__reqUrlFormat + 'users', json.dumps(payload), headers=JSON_HEADER)
-        if result.status_code == requests.codes.ok:
-            return True
-        else:
+        try:
+            token = HxHelper.get_token()
+            JSON_HEADER['Authorization'] = 'Bearer ' + token
+            payload = {'username': username, 'password': password, 'nickname': nickname}
+            result = requests.post(HxHelper.__reqUrlFormat + 'users', json.dumps(payload), headers=JSON_HEADER)
+            if result.status_code == requests.codes.ok:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
             return False
 
     # 删除环信账户

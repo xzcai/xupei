@@ -6,16 +6,34 @@ import data.database.Mongo.test
 from data.database.Mongo.HxToken import HxToken
 from data.model.person import Person
 from src import app
+from util.Encrypt import EncryptPass, BcryptPassManager
 from util.hx import HxHelper
+from util.image_helper import ImageHelper, PicType
 from util.phone_helper import PhoneHelper
-from util.result_helper import result_success
+from util.result_helper import result_success, result_fail
+from util.token_helper import make_token, TokenHelper
 from util.verify import Ver
 
 
+def print1(func):
+    print('123456')
+    def print_j():
+        print1('123213')
+        func()
+        print1('123213')
+        return 'sdfs'
+    return print_j
+
+
+
+
+
+
 @app.route("/time")
+@print1
 def timetest():
-    print(datetime.datetime.utcnow())
-    return "ok"
+    print('000000')
+    return 'ok'
 
 
 @app.route('/test', methods=['get'])
@@ -30,61 +48,28 @@ def test():
     return '11111111'
 
 
-@app.route("/test<int:number>/<string:name>")
-def test2(number, name):
-    print(number, name)
-    data.database.Mongo.test.Tes(code='S').save()
-    return 'ok111'
-
-
-@app.route("/user/login", methods=['get'])
-def index_login():
-    person = Person('cxz', 'gen', 12)
-    print(person.address)
-    print(person.get_test())
-    print(Person.how_many())
-    return person.get_test()[0]
-
-
 @app.route("/test1")
 def test1():
-    HxHelper.create_account('sdfss', 'sdssf', 'dsf')
+    leniystr = "VBORw0KGgoAAAANSUhEUgAAACwAAAAOCAYAAABU4P48AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAGYktHRAD/AP8A/6C9p5MAAAF6SURBVEhL1ZY9coMwEIWfchZIkckJxAmAhoojiNJu3KV0lwZK+xRU6ATmBJkUEXdRVj8MmGFsk9ge+5vReFlb2of0diymCTwRL0CHKmJgjKGQPnszJAqqw1iEqvOphZDgexJjRweq9QGrwKcWcmfB/+cCwf0xDiMan2dXIZp870ZBM6ecsIQs7Lzx2rLwa428ekawKZBgTxEvFbQqwSlu1+G830VDx61Qmh/RrO0So8YZBH2060//ohK1KUyILHYBcVqwrK1YgxHJwjVa//z1MxUj0OzMwgFe311mGTEyo5gq1kZxX5uX2Ax6L/QwTVK2WYZxmHYNf0Pow78SO8XYk2Lpt5fnKW3BwGWC228oH8756mrEG2enfYLEbS/y9HhjTgvuF6DDSaIKHTXYdsZX1yNAmtuCDp5jovfcDgdYHTQa1w0IrYc5SqVh7XoDgjS3jW0QH6sjO1jMX/NDoUpNgum6IHTjU2MeSLDSZD9zr7FDzKklnuzyA/wCcpDKoLig94YAAAAASUVORK5CYII="
+    if ImageHelper.base64_to_image(leniystr, PicType.user) is None:
+        return result_fail('图片上传出错')
+    return result_success('成功')
+
+
+def func():
+
+    num = 10 / 0
+    print(num)
+
+
+
+@app.route("/test2")
+def test2():
+    token = BcryptPassManager.encrypt()
+    content = BcryptPassManager.decrypt(token)
+
+    print('12332456789',make_token(1,3,4))
+    print(TokenHelper.decrypt(make_token(1,3,4)))
+
+    print(content['id'])
     return 'ok'
-
-
-@app.route("/user/find")
-def find():
-    data11 = data.database.Mongo.test.Tes.objects(code='S')
-    for a in data11:
-        print(a.id, a.code)
-    return 'ok'
-
-
-@app.route("/mongo")
-def mongotest():
-    # HxToken(value='123', past_due=datetime.datetime.utcnow).save()
-
-    timespan = datetime.datetime.now() + datetime.timedelta(seconds=120)
-    print(timespan)
-    # for a in fate:
-    #     print(a.id,'sdfs')
-    return 'sdf'
-
-
-@app.route("/register")
-def test_register():
-    print('jinlai')
-    jsons = {'account': '123', 'password': '1234565', 'pic': '1.jpg', 'nickname': 'cxz', 'sex': 1, 'province': 'jiangx',
-             'city': 'lep'}
-    try:
-        re = requests.post("localhost:8878/user/register", json.dumps(jsons))
-        print(re)
-    except Exception as e:
-        print(e)
-    return 'ok'
-
-
-@app.route('/send')
-def send():
-    data = [{'d': 's'}]
-    return result_success('chengg')

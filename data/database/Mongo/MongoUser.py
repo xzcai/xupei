@@ -1,5 +1,5 @@
 from mongoengine import StringField, ListField, IntField, ReferenceField, ObjectIdField, EmbeddedDocumentField, \
-    EmbeddedDocument
+    EmbeddedDocument, BooleanField
 from data.database.database import mongo
 import datetime
 
@@ -7,20 +7,26 @@ from util.macro import code_send_mean, active_state_type
 
 
 class Token(EmbeddedDocument):
-    value = StringField()
-    due_time = mongo.DateTimeField()
+    value = StringField(default='')
+    due_time = mongo.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(seconds=24 * 60 * 60 * 60))
 
 
 class Info(EmbeddedDocument):
-    pic = StringField()
-    nickname = StringField()
-
-
-class Verify(EmbeddedDocument):
-    phone = StringField(max_length=11, min_length=11)
-    count = IntField()
-    due_time = mongo.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(10 * 60))
-    type = IntField(choices=code_send_mean)
+    account = StringField(required=True)
+    password = StringField(required=True)
+    xp_account = StringField()
+    pic = StringField(required=True)
+    nickname = StringField(required=True)
+    mood = StringField(default='')
+    sex = BooleanField(default=False)  # false=男
+    province = StringField(default='')
+    city = StringField(default='')
+    user_origin = IntField(default=1)
+    device_id = StringField(default='')
+    hx_account = StringField(required=True)
+    hx_password = StringField(required=True)
+    is_verify = BooleanField(default=False)
+    is_protect = BooleanField(default=False)
 
 
 class InterruptComment(EmbeddedDocument):
@@ -53,10 +59,13 @@ class MongoUser(mongo.Document):
     friends = ListField(IntField(), default=list)
     activity_recommend = ListField(ObjectIdField(), default=list)
     activity_attend = ListField(ObjectIdField(), default=list)
-    info = EmbeddedDocumentField(Info)
-    verify = EmbeddedDocumentField(Verify)
+    info = EmbeddedDocumentField(Info,required=True)
     activity_state = ListField(EmbeddedDocumentField(ActivityState), default=list)
 
     meta = {
-        'collection': 'user_info'
+        'collection': 'user_info',
+        'indexes': [
+            'info.account',
+            'info.hx_account'
+        ]
     }

@@ -15,3 +15,7 @@ def result_fail(msg, data=[]):
     result['msg'] = msg
     result['data'] = data
     return jsonify(result)
+
+
+
+
