@@ -4,9 +4,7 @@ import bcrypt
 
 from flask.ext.mongoengine import unicode
 
-
 import jwt
-
 
 
 def EncryptPass(pwd):
@@ -18,15 +16,15 @@ def EncryptPass(pwd):
 class BcryptPassManager:
     @staticmethod
     def check_valid(password, hashed):
-        try:
+        # try:
             result = bcrypt.hashpw(password.encode("utf-8"), hashed.encode("utf-8"))
             if result == hashed.encode("utf-8"):
                 return True
             else:
                 return False
-        except Exception as e:
-            print('校验密码错误',e)
-            return False
+        # except Exception as e:
+        #     print('校验密码时出现异常错误', e)
+        #     return False
 
     @staticmethod
     def encrypt_pass(password):
@@ -35,7 +33,8 @@ class BcryptPassManager:
 
     @staticmethod
     def encrypt():  # content:明文
-        encoded = jwt.encode({'some': 'payload', 'id': '1575704895111245452454', 'us': 'sdf'}, 'secret', algorithm='HS256')
+        encoded = jwt.encode({'some': 'payload', 'id': '1575704895111245452454', 'us': 'sdf'}, 'secret',
+                             algorithm='HS256')
         print(encoded)
         return encoded
 

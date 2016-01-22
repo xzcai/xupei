@@ -12,8 +12,6 @@ class Token(EmbeddedDocument):
 
 
 class Info(EmbeddedDocument):
-    account = StringField(required=True)
-    password = StringField(required=True)
     xp_account = StringField()
     pic = StringField(required=True)
     nickname = StringField(required=True)
@@ -59,13 +57,12 @@ class MongoUser(mongo.Document):
     friends = ListField(IntField(), default=list)
     activity_recommend = ListField(ObjectIdField(), default=list)
     activity_attend = ListField(ObjectIdField(), default=list)
-    info = EmbeddedDocumentField(Info,required=True)
+    info = EmbeddedDocumentField(Info, required=True)
     activity_state = ListField(EmbeddedDocumentField(ActivityState), default=list)
 
     meta = {
         'collection': 'user_info',
         'indexes': [
-            'info.account',
             'info.hx_account'
         ]
     }

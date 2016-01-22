@@ -1,6 +1,5 @@
-import datetime
 import requests
-from flask import json
+from flask import json, request
 
 import data.database.Mongo.test
 from data.database.Mongo.HxToken import HxToken
@@ -11,29 +10,58 @@ from util.hx import HxHelper
 from util.image_helper import ImageHelper, PicType
 from util.phone_helper import PhoneHelper
 from util.result_helper import result_success, result_fail
-from util.token_helper import make_token, TokenHelper
+from util.token_helper import TokenHelper
 from util.verify import Ver
+import datetime
+import time
 
 
-def print1(func):
-    print('123456')
-    def print_j():
-        print1('123213')
+
+
+
+
+
+
+def deco(func):
+    def _deco():
+        if request.method == 'POST':
+            token = request.form.get('token')
+        else:
+            token = request.args.get('token')
+        print(token)
+        print("before myfunc() called")
         func()
-        print1('123213')
-        return 'sdfs'
-    return print_j
 
-
-
-
+    return _deco
 
 
 @app.route("/time")
-@print1
+@deco
 def timetest():
-    print('000000')
-    return 'ok'
+    print('sdfs')
+    data = TokenHelper.decrypt(
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE5LCJhY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEifQ.iPgNKTIszyV3ipRuqlZWPLiDdMSf5S4IfXOMpvs20')
+    print(data)
+
+    tt = str(datetime.datetime.now() + datetime.timedelta(seconds=-24 * 60 * 60 * 60))
+    print(tt)
+
+    ttt = (datetime.datetime.now() + datetime.timedelta(seconds=24 * 60 * 60 * 60)).timetuple()
+    print(time.mktime(ttt))
+
+    timestamp = time.mktime(datetime.datetime.now().timetuple())
+    print(timestamp)
+    ltime = time.localtime(timestamp)
+    print(ltime)
+
+    tttt = time.strftime("%Y-%m-%d %H:%M:%S", ltime)
+    print(tttt)
+    if tt > str(datetime.datetime.now()):
+        print('yes')
+    else:
+        print('no')
+
+    return '1111111'
 
 
 @app.route('/test', methods=['get'])
@@ -57,19 +85,11 @@ def test1():
 
 
 def func():
-
     num = 10 / 0
     print(num)
 
 
-
 @app.route("/test2")
 def test2():
-    token = BcryptPassManager.encrypt()
-    content = BcryptPassManager.decrypt(token)
-
-    print('12332456789',make_token(1,3,4))
-    print(TokenHelper.decrypt(make_token(1,3,4)))
-
-    print(content['id'])
+    print(BcryptPassManager.encrypt_pass('456321'))
     return 'ok'

@@ -1,15 +1,15 @@
 from flask import request
-from flask.ext.mongoengine import unicode
-
 from data.database.Mongo.MongoUser import MongoUser, Info
 from data.database.Sql.User import UserInfo
 from data.database.database import mysql
 from src import app
+from src.bll.user_bll import modify_password
 from util.Encrypt import BcryptPassManager
+from util.decorator_helper import filter_exception
 from util.hx import HxHelper
 from util.image_helper import ImageHelper, PicType
 from util.result_helper import result_success, result_fail
-import util.token_helper
+from util.token_helper import filter_token, make_token
 
 
 @app.route("/user/register", methods=['get', 'post'])
@@ -39,8 +39,7 @@ def user_register():
                 mysql.session.add(user)
                 mysql.session.commit()
 
-                info = Info(account=user.Account,password=user.Password, pic=user.UserPic, nickname=user.NickName, sex=user.Sex,
-                            province=user.Province,
+                info = Info(pic=user.UserPic, nickname=user.NickName, sex=user.Sex, province=user.Province,
                             city=user.City, hx_account=user.HX_Account, hx_password=user.HX_Password)
                 mongo_user = MongoUser(mysql_id=user.ID, info=info, token={})
                 mongo_user.save()
@@ -65,22 +64,68 @@ def user_login():
     account = request.args.get("account")
     password = request.args.get("password")
     device_id = request.args.get("device_id")
-    user = MongoUser.objects(info__account=account).first()  # .only('info')  .exclude('info.device_id').all_fields()
-    if user is not None and BcryptPassManager.check_valid(password, user.info.password):
-        if user.info.is_verify and user.info.device_id != device_id:
+    user = UserInfo.query.filter_by(Account=account).first()
+    # user111 = MongoUser.objects(mysql_id=220).only('info').first()   .only('info')  .exclude('info.device_id').all_fields()
+    # print(user111.info.pic)
+
+    if user is not None and BcryptPassManager.check_valid(password, user.Password):
+        mongo_user = MongoUser.objects(mysql_id=user.ID).first()
+        if mongo_user is None:
+            return result_fail('数据有误，请联系客服')
+        if mongo_user.info.is_verify and mongo_user.info.device_id != device_id:
             return result_fail('您开启过设备保护，该设备不是常用设备')
         else:
-            return util.token_helper.make_token(user.mysql_id, user.info)
+            return make_token(user.ID)
     else:
         return result_fail('账号或密码错误')
 
 
-@app.route("/user/password", methods=['put'])
-def modify_password():
-    token = request.form.get('token')
-    origin_pass = request.form.get("origin_pass")
-    new_pass = request.form.get("new_pass")
-    return 'ok'
+@app.route("/user/password", methods=['get'])
+@filter_exception
+@filter_token
+def modify(token):
+    origin_pass = request.args.get("origin_pass")
+    new_pass = request.args.get("new_pass")
+
+    uid = token['id']
+    user = UserInfo.query.filter_by(ID=uid).first()
+    # user = MongoUser.objects(mysql_id=uid).first()
+    if BcryptPassManager.check_valid(origin_pass, user.Password):
+        return modify_password(uid, user.Password, BcryptPassManager.encrypt_pass(new_pass))
+    else:
+        return result_fail('密码输入错误')
+
+
+@app.route("/user/password_code", methods=['get'])
+@filter_exception
+@filter_token
+def modify_sad(token):
+    a = 10 / 0
+    print(token)
+    return 'pk'
+
+
+# 设置账户保护
+@app.route('/user/protect', methods=['get'])
+def set_protect():
+    pass
+
+
+# 设置用户信息
+@app.route('/user/info', methods=['get'])
+def set_info():
+    pass
+
+
+# 发布用户活动
+@app.route('/user/activity', methods=['get'])
+def issue_activity():
+    pass
+
+
+@app.route('/user/dynamic', methods=['get'])
+def issue_dynamic():
+    pass
 
 
 @app.route("/user/test", methods=['get', 'post'])

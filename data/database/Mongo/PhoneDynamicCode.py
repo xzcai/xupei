@@ -4,7 +4,7 @@ from mongoengine import StringField, IntField, BooleanField
 from data.database.database import mongo
 
 
-class RegisterCode(mongo.Document):
+class PhoneDynamicCode(mongo.Document):
     phone = StringField(max_length=11)
     send_time = mongo.DateTimeField(default=datetime.datetime.now())
     send_code = IntField()
@@ -12,5 +12,5 @@ class RegisterCode(mongo.Document):
     # is_used = BooleanField(default=False)
     send_type = IntField(default=1)
     meta = {
-        'collection': 'user_register_code'
+        'collection': 'phone_dynamic_code'
     }

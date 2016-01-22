@@ -1,23 +1,14 @@
-from util.token_helper import make_token
-from flask import request
+from data.database.Sql.User import UserInfo
+from data.database.database import mysql
+from util.result_helper import result_fail, result_success
 
 
-# （注册 登陆 修改密码） 成功后修改token和返回的用户信息
-def user_success(user):
-    # 修改返回token
-    token = make_token(user)
-    if token is None:
-        return False, None
-    else:
-        data = {'token': token, "userinfo": user}
-        return True, data
-
-
-# 判断token是否过期
-def handle_token():
-    if request.method == 'POST':
-        token=request.form.get('token')
-    else:
-        token=request.form.get('token')
-
-
+def modify_password(uid, origin_password, new_password):
+    try:
+        UserInfo.query.filter_by(ID=uid).update({UserInfo.Password: new_password})
+        mysql.session.commit()
+        # MongoUser.objects(mysql_id=uid).update(info__password=new_password)
+        return result_success('修改密码成功')
+    except Exception as e:
+        print('修改密码出错', e)
+        return result_fail('修改密码出错' + str(e))
