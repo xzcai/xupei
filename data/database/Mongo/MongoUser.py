@@ -12,10 +12,10 @@ class Token(EmbeddedDocument):
 
 
 class Info(EmbeddedDocument):
-    xp_account = StringField()
+    xp_account = StringField(unique=True)
     pic = StringField(required=True)
     nickname = StringField(required=True)
-    mood = StringField(default='')
+    signature = StringField(default='')
     sex = BooleanField(default=False)  # false=男
     province = StringField(default='')
     city = StringField(default='')
@@ -40,10 +40,11 @@ class Posture(EmbeddedDocument):
 
 
 class ActivityState(EmbeddedDocument):
+    object_id = ObjectIdField()
     type = IntField(choices=active_state_type)
     interrupt_comment = EmbeddedDocumentField(InterruptComment)
     content = StringField()
-    posture = EmbeddedDocumentField(Posture)
+    posture = ListField(EmbeddedDocumentField(Posture), default=list)
     raise_up = ListField(IntField(), default=list)
     address = StringField()
     pics = ListField(StringField(), default=list)
@@ -63,6 +64,7 @@ class MongoUser(mongo.Document):
     meta = {
         'collection': 'user_info',
         'indexes': [
-            'info.hx_account'
+            'info.hx_account',
+            'activity_state.object_id'
         ]
     }

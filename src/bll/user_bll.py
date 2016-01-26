@@ -3,7 +3,7 @@ from data.database.database import mysql
 from util.result_helper import result_fail, result_success
 
 
-def modify_password(uid, origin_password, new_password):
+def modify_password(uid, new_password):
     try:
         UserInfo.query.filter_by(ID=uid).update({UserInfo.Password: new_password})
         mysql.session.commit()

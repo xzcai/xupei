@@ -1,9 +1,13 @@
+from functools import wraps
+
+from PIL import Image
+
 from src import app
 from util.result_helper import result_fail
-from util.token_helper import filter_token
 
 
 def deco1(func):
+    @wraps
     def _deco1():
         try:
             return func()
@@ -14,47 +18,51 @@ def deco1(func):
     return _deco1
 
 
+def mer():
+
+    pics = ['C:/Users/Administrator/Desktop/img/a1.jpg', 'C:/Users/Administrator/Desktop/img/a1.jpg',
+            'C:/Users/Administrator/Desktop/img/a1.jpg', 'C:/Users/Administrator/Desktop/img/a1.jpg',
+            'C:/Users/Administrator/Desktop/img/a1.jpg', 'C:/Users/Administrator/Desktop/img/a1.jpg',
+            'C:/Users/Administrator/Desktop/img/a1.jpg', 'C:/Users/Administrator/Desktop/img/a1.jpg',
+            'C:/Users/Administrator/Desktop/img/a1.jpg']
+    post = [(0, 0), (0, 40), (0, 80),
+            (40, 0), (40, 40), (40, 80),
+            (80, 0), (80, 40), (80, 80)]
+    merge_img = Image.new('RGB', (120, 120), 0x808080)
+    for i in range(0, len(pics)):
+        img_small = Image.open(pics[i])
+
+        # box = clipimage(img_small.size)
+        # img_small_X = img_small.crop(box)
+
+        img_small.thumbnail((40, 40), Image.ANTIALIAS)
+        img_small.save('C:/Users/Administrator/Desktop/' + str(i) + '1.jpg')
+        merge_img.paste(img_small, post[i])
+        merge_img.save('C:/Users/Administrator/Desktop/' + str(i) + '.jpg', quality=70)
+    merge_img.save('C:/Users/Administrator/Desktop/1111111111111111.jpg', quality=70)
+
+
+def clipimage(size):
+    width = int(size[0])
+    height = int(size[1])
+    box = ()
+    if (width > height):
+        dx = width - height
+        box = (dx / 2, 0, height + dx / 2, height)
+    else:
+        dx = height - width
+        box = (0, dx / 2, width, width + dx / 2)
+    return box
+
+
 @app.route("/con/test")
-@deco1
 def dd():
-    print('123')
+    mer()
+    # watermark('C:/Users/Administrator/Desktop/img/a1.jpg', 'C:/Users/Administrator/Desktop/img/a1.jpg')
     return 'ok'
 
 
-# @app.route("/con/test2")
-# @deco1
-# def dd2():
-#     print('456')
-#     return 'ok'
-
-# @deco1
-# def test00():
-#     return 'ok'
-#
-#
-#
-# @app.route("/con/test")
-# @deco1
-# @filter_token
-# def test11(token):
-#     print('123546465')
-#     a = 10 / 0
-#     print(a)
-#     return 'ok'
-#
-#
-# @app.route('/ds/ss')
-# @app.route('/ds/s')
-# @deco1
-# def test22():
-#     return 'ok'
-
-#
-# @deco1
-# @app.route("/con/test22", methods=['get'])
-# def modify11():
-#     print('dsf')
-#     a = 10 / 0
-#     print(a)
-#     print('123456')
-#     return 'ok'
+def test():
+    pass
+    # data = [{'id':1,'uid': 1, 'pid': 0, 'content': 'nihao'}, {'uid': 2, 'pid': 0, 'content': 'nihao'},
+    #         {'uid': 1, 'pid': 0, 'content': 'nihao'}, {'uid': 1, 'pid': 0, 'content': 'nihao'}]

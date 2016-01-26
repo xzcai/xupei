@@ -3,19 +3,20 @@ from flask import jsonify
 
 # 成功返回的结果
 def result_success(msg, data=[]):
-    result = {"status": True, "msg": '', 'data': data}
-    result['msg'] = msg
-    result['data'] = data
-    return jsonify(result)
+    back_result = {"status": True, 'msg': msg, 'data': data}
+    print(back_result)
+    return jsonify(back_result)
 
 
 # 失败返回的结果
 def result_fail(msg, data=[]):
-    result = {'status': False, 'msg': '', 'data': data}
-    result['msg'] = msg
-    result['data'] = data
-    return jsonify(result)
+    back_result = {'status': False, 'msg': msg, 'data': data}
+    print(back_result)
+    return jsonify(back_result)
 
 
-
-
+# 返回的结果
+def result(msg, status=False, data=[]):
+    back_result = {'status': status, 'msg': msg, 'data': data}
+    print(back_result)
+    return jsonify(back_result)

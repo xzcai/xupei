@@ -1,5 +1,4 @@
 import re
-from functools import wraps
 
 
 class Ver:

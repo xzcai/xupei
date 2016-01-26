@@ -1,6 +1,8 @@
 import base64
 import uuid
 
+from PIL import Image
+
 from util.result_helper import result_fail
 
 
@@ -22,6 +24,8 @@ class PicType(object):
 
 
 class ImageHelper(object):
+    __width = 120
+    __height = 120
     # base64 转为图片存储
     @staticmethod
     def base64_to_image(str_base64, pic_type, pic_name=None):
@@ -44,5 +48,12 @@ class ImageHelper(object):
         finally:
             img.close()
 
-
-
+    # 生成九宫格图片
+    @staticmethod
+    def sudoku_pic(pics):
+        merge_img = Image.new('RGB', (ImageHelper.__width, ImageHelper.__height), 0x808080)
+        for img in pics:
+            img_small = Image.open(img)
+            img_small.thumbnail((30, 30))
+            merge_img.paste(img_small, (0, 0))
+        merge_img.save('C:/Users/Administrator/Desktop/1111111111111111.jpg', quality=70)

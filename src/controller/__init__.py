@@ -1,1 +1,1 @@
-from . import index, user, phone, test
+from . import index, user, phone, test, activity

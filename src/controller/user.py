@@ -1,17 +1,21 @@
+import flask
 from flask import request
 from data.database.Mongo.MongoUser import MongoUser, Info
 from data.database.Sql.User import UserInfo
 from data.database.database import mysql
 from src import app
 from src.bll.user_bll import modify_password
+from src.controller.phone import verify_bll
 from util.Encrypt import BcryptPassManager
 from util.decorator_helper import filter_exception
 from util.hx import HxHelper
 from util.image_helper import ImageHelper, PicType
-from util.result_helper import result_success, result_fail
+from util.request_helper import request_bool, request_xp_account
+from util.result_helper import result_success, result_fail, result
 from util.token_helper import filter_token, make_token
 
 
+# 01用户注册
 @app.route("/user/register", methods=['get', 'post'])
 def user_register():
     account = request.args.get('account')
@@ -59,14 +63,14 @@ def user_register():
         return result_fail(str(e))
 
 
-@app.route("/user/login", methods=['get', 'post'])
-def user_login():
+# 02通过密码登陆
+@app.route("/user/login_pass", methods=['get', 'post'])
+@filter_exception
+def user_login_pass():
     account = request.args.get("account")
     password = request.args.get("password")
     device_id = request.args.get("device_id")
     user = UserInfo.query.filter_by(Account=account).first()
-    # user111 = MongoUser.objects(mysql_id=220).only('info').first()   .only('info')  .exclude('info.device_id').all_fields()
-    # print(user111.info.pic)
 
     if user is not None and BcryptPassManager.check_valid(password, user.Password):
         mongo_user = MongoUser.objects(mysql_id=user.ID).first()
@@ -80,10 +84,40 @@ def user_login():
         return result_fail('账号或密码错误')
 
 
-@app.route("/user/password", methods=['get'])
+# 03通过验证码登陆
+@app.route("/user/login_code", methods=['get'])
+@filter_exception
+def user_login_code():
+    phone = request.args.get("phone")
+    code = request.args.get("code")
+    status, msg = verify_bll(phone, code, 2)
+    if status is False:
+        return result(msg, status)
+    user = UserInfo.query.filter_by(Account=phone).first()
+    return make_token(user.ID)
+
+
+# 04修改注册账号
+@app.route("/user/account", methods=['get'])
 @filter_exception
 @filter_token
-def modify(token):
+def modify_account(token):
+    uid = token['id']
+    phone = request.args.get('phone')
+    code = request.args.get('code')
+    status, msg = verify_bll(phone, code, 6)
+    if status is False:
+        return result(msg, status)
+    obj = UserInfo.query.filter_by(ID=uid).update({UserInfo.Account: phone})
+    mysql.session.commit()
+    return make_token(uid)
+
+
+# 05通过原始密码修改手机号码
+@app.route("/user/password_pass", methods=['get'])
+@filter_exception
+@filter_token
+def modify_pass_by_pass(token):
     origin_pass = request.args.get("origin_pass")
     new_pass = request.args.get("new_pass")
 
@@ -91,44 +125,104 @@ def modify(token):
     user = UserInfo.query.filter_by(ID=uid).first()
     # user = MongoUser.objects(mysql_id=uid).first()
     if BcryptPassManager.check_valid(origin_pass, user.Password):
-        return modify_password(uid, user.Password, BcryptPassManager.encrypt_pass(new_pass))
+        return modify_password(uid, BcryptPassManager.encrypt_pass(new_pass))
     else:
         return result_fail('密码输入错误')
 
 
+# 06通过验证码修改手机号码
 @app.route("/user/password_code", methods=['get'])
 @filter_exception
 @filter_token
-def modify_sad(token):
-    a = 10 / 0
-    print(token)
-    return 'pk'
+def modify_pass_by_code(token):
+    new_pass = request.args.get("new_pass")
+    uid = token['id']
+    return modify_password(uid, BcryptPassManager.encrypt_pass(new_pass))
 
 
-# 设置账户保护
+# 07设置账户保护
 @app.route('/user/protect', methods=['get'])
-def set_protect():
-    pass
+@filter_exception
+@filter_token
+def set_protect(token):
+    uid = token['id']
+    type = request.args.get("type")
+    device_id = request.args.get("device_id")
+    if type == "1":
+        type = True
+    else:
+        type = False
+    MongoUser.objects(mysql_id=uid).update_one(info__device_id=device_id, info__is_protect=type)
+    return result_success("设置成功")
 
 
-# 设置用户信息
+# 08设置用户信息
 @app.route('/user/info', methods=['get'])
-def set_info():
-    pass
+@filter_exception
+@filter_token
+def set_info(token):
+    uid = token['id']
+
+    # 修改昵称
+    nickname = request.args.get('nickname')
+    if nickname is not None:
+        MongoUser.objects(mysql_id=uid).update_one(info__nickname=nickname)
+
+    # 修改头像
+    pic = request.args.get('pic')
+    if pic is not None:
+        MongoUser.objects(mysql_id=uid).update_one(info__pic=pic)
+
+    # 修改个性签名
+    signature = request.args.get('signature')
+    if signature is not None:
+        MongoUser.objects(mysql_id=uid).update_one(info__signature=signature)
+
+    # 修改性别
+    sex = request_bool('sex', False)
+    if isinstance(sex, bool):
+        MongoUser.objects(mysql_id=uid).update_one(info__sex=sex)
+    else:
+        return sex
+
+    # 修改省市
+    province = request.args.get('province')
+    city = request.args.get('city')
+    if province is not None and city is not None:
+        MongoUser.objects(mysql_id=uid).update_one(info__province=province, info__city=city)
+
+    return result_success('修改成功')
 
 
-# 发布用户活动
+# 09设置许陪号
+@app.route('/user/xp_account', methods=['get'])
+@filter_exception
+@filter_token
+def set_xp_account(token):
+    uid = token['id']
+    xp_account = request_xp_account('xp_account')
+    if isinstance(xp_account, flask.wrappers.Response):
+        return xp_account
+
+    user = MongoUser.objects(mysql_id=uid).only('info').first()
+    if user.info.xp_account is None:
+        MongoUser.objects(mysql_id=uid).update_one(info__xp_account=xp_account)
+        return result_success('许陪号设置成功')
+    else:
+        return result_fail('许陪号只能设置一次，不能在重新设置')
+
+
+# 10发布用户活动
 @app.route('/user/activity', methods=['get'])
+@filter_exception
+@filter_token
 def issue_activity():
     pass
 
 
+# 11发布用户动态
 @app.route('/user/dynamic', methods=['get'])
+@filter_exception
+@filter_token
 def issue_dynamic():
     pass
-
-
-@app.route("/user/test", methods=['get', 'post'])
-def user_test():
-    pwd = BcryptPassManager.encrypt_pass('123')
-    return 'ok'
