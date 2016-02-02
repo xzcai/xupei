@@ -18,5 +18,17 @@ active_state_type = ((1, '推荐'),
 # 加解密 密钥
 ENCRYPT_KEY = 'benhu_xupei'
 
+cast_status = (
+    (1, '免费'),
+    (2, '自费'),
+    (3, '既有免费')
+)
 
 
+class Activity_Attribute(object):
+    new = '1'
+    hot = "2"
+    recommend = "3"
+    free = "4"
+    near = "5"
+    select = "6"

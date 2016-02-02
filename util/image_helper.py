@@ -24,8 +24,8 @@ class PicType(object):
 
 
 class ImageHelper(object):
-    __width = 120
-    __height = 120
+    __border = 120
+
     # base64 转为图片存储
     @staticmethod
     def base64_to_image(str_base64, pic_type, pic_name=None):
@@ -50,10 +50,84 @@ class ImageHelper(object):
 
     # 生成九宫格图片
     @staticmethod
-    def sudoku_pic(pics):
-        merge_img = Image.new('RGB', (ImageHelper.__width, ImageHelper.__height), 0x808080)
-        for img in pics:
-            img_small = Image.open(img)
-            img_small.thumbnail((30, 30))
-            merge_img.paste(img_small, (0, 0))
-        merge_img.save('C:/Users/Administrator/Desktop/1111111111111111.jpg', quality=70)
+    def sudoku_pic(pics, qid):
+        try:
+            img_path = '/imgs/qun/' + qid + '.jpg'
+            merge_img = Image.new('RGB', (ImageHelper.__border, ImageHelper.__border), 0x808080)
+            if len(pics) == 1:
+                return pics[0]
+            else:
+                border, position = ImageHelper.position_size(pics, ImageHelper.__border)
+                for i in range(0, len(pics)):
+                    try:
+                        img = Image.open(pics[i])
+                        box = ImageHelper.clip_image(img.size)
+                        img_small = img.crop(box)
+                        img_small.thumbnail((border, border))
+                        merge_img.paste(img_small, position[i])
+                    except Exception as e:
+                        print('生成九宫格出错' + str(e))
+                    finally:
+                        img.close()
+                merge_img.save('.' + img_path)
+                return img_path
+        except Exception as e:
+            print('生成九宫格出错' + str(e))
+        finally:
+            merge_img.close()
+
+    # 切图
+    @staticmethod
+    def clip_image(size):
+        width = int(size[0])
+        height = int(size[1])
+        if (width > height):
+            dx = width - height
+            box = (int(dx / 2), 0, int(height + dx / 2), height)
+        else:
+            dx = height - width
+            box = (0, int(dx / 2), width, int(width + dx / 2))
+        return box
+
+    # 确定小图大小和位置
+    @staticmethod
+    def position_size(pics, length=140):
+        n = len(pics)
+        margin = 2
+        if n <= 4:
+            border = int((length - margin * 3) / 2)
+        else:
+            border = int((length - margin * 4) / 3)
+        if n == 1:
+            return pics[0]
+        elif n == 2:
+            position = [(margin, int((length - border) / 2)), (border + 4, int((length - border) / 2))]
+        elif n == 3:
+            position = [(int((length - border) / 2), 2), (2, border + 4), (border + 4, border + 4)]
+        elif n == 4:
+            position = [(2, 2), (border + 4, 2), (2, border + 4), (border + 4, border + 4)]
+        elif n == 5:
+            position = [(2 + int(border / 2), (2 + int(border / 2))),
+                        ((int(border / 2) + border + 4), (2 + int(border / 2))),
+                        (2, (int(border / 2) + border + 4)), (border + 4, (int(border / 2) + border + 4)),
+                        (2 * border + 6, (int(border / 2) + border + 4))
+                        ]
+        elif n == 6:
+            position = [(2, int(border / 2) + 2), (border + 4, int(border / 2) + 2),
+                        (2 * border + 6, int(border / 2) + 2),
+                        (2, (3 * border / 2) + 4), (border + 4, (3 * border / 2) + 4),
+                        (2 * border + 6, (3 * border / 2) + 4)]
+        elif n == 7:
+            position = [(border + 4, 2),
+                        (2, 4 + border), (border + 44 + border), (2 * border + 6, 4 + border),
+                        (2, 2 * border + 6), (border + 4, 2 * border + 6), (2 * border + 6, 2 * border + 6)]
+        elif n == 8:
+            position = [(int(border / 2) + 2, 2), (int(3 * border / 2) + 4, 2),
+                        (2, 4 + border), (border + 4, 4 + border), (2 * border + 6, 4 + border),
+                        (2, 2 * border + 6), (border + 4, 2 * border + 6), (2 * border + 6, 2 * border + 6)]
+        else:
+            position = [(2, 2), (border + 4, 2), (2 * border + 6, 2),
+                        (2, 4 + border), (border + 4, 4 + border), (2 * border + 6, 4 + border),
+                        (2, 2 * border + 6), (border + 4, 2 * border + 6), (2 * border + 6, 2 * border + 6)]
+
+        return border, position

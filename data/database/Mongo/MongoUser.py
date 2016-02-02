@@ -58,6 +58,7 @@ class MongoUser(mongo.Document):
     friends = ListField(IntField(), default=list)
     activity_recommend = ListField(ObjectIdField(), default=list)
     activity_attend = ListField(ObjectIdField(), default=list)
+    activity_collect = ListField(ObjectIdField(), default=list)
     info = EmbeddedDocumentField(Info, required=True)
     activity_state = ListField(EmbeddedDocumentField(ActivityState), default=list)
 

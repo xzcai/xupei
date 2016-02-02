@@ -35,7 +35,7 @@ def filter_token(func):
         else:
             token = request.form.get('token')
         if token is None:
-            return result_fail('token 必填')
+            return result_fail('token 参数是必须的')
         data = TokenHelper.decrypt(token)
         if data is None:
             return result_fail('token 无效或过期，请重新登陆')

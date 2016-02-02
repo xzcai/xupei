@@ -40,3 +40,35 @@ def request_xp_account(args_name, required=True):
         return args_value
     else:
         return result_fail(args_name + ' 许陪号只能是【6-10】位的字母和数字组合')
+
+
+# 对必须输入的参数进行验证
+def request_required(*args_name):
+    for name in args_name:
+        if request.args.get(name) is None:
+            return result_fail(name + ' 参数是必须的')
+
+
+# 返回int 类型必填参数
+# def test_2(label):
+#     def _test_1(func):
+#         def __test_1():
+#             d = request.args.get(label)
+#             if d is None:
+#                 return result_fail(label + " 是必须的")
+#             return func()
+#
+#         return __test_1
+#
+#     return _test_1
+# def request_required_int(*args)
+#     def _request_required_int(func):
+#         def __request_required_int():
+#             args_value = request.args.get(args_name)
+#             if args_value is None:
+#                 return result_fail(args_name + ' 参数是必须的')
+#             else:
+#                 return int(args_value)
+#             return func()
+#         return __request_required_int
+#     return _request_required_int
