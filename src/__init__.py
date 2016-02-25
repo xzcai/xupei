@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, render_template
 
 from data.database.database import mongo, mysql
 
@@ -17,3 +17,7 @@ def create_app():
 app = create_app()
 
 from . import controller
+
+@app.route('/api')
+def send_api_html():
+    return render_template('api.html')

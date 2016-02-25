@@ -20,7 +20,7 @@ def request_bool(args_name, required=True):
     elif args_value == "0" or args_value.lower() == 'false':
         return False
     else:
-        return result_fail(args_name + ' 参数拼写错误')
+        return result_fail(args_name + ' 参数格式错误')
 
 
 # 对许陪号进行验证
@@ -48,6 +48,17 @@ def request_required(*args_name):
         if request.args.get(name) is None:
             return result_fail(name + ' 参数是必须的')
 
+
+# (输入所有参数名)获取所有的参数值
+def request_all_values(*args_name):
+    values = []
+    if request.method == 'GET':
+        for name in args_name:
+            values.append(request.args.get(name))
+    else:
+        for name in args_name:
+            values.append(request.form.get(name))
+    return values
 
 # 返回int 类型必填参数
 # def test_2(label):

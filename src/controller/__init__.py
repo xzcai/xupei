@@ -1,1 +1,1 @@
-from . import index, user, phone, test, activity, queue, sponsor
+from . import user, phone, test, activity, queue, sponsor, dynamic

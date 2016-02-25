@@ -21,6 +21,8 @@ class PicType(object):
     bank = 'bank'
     # 标签图片
     label = 'label'
+    # 用户发布动态图片
+    dynamic = 'dynamic'
 
 
 class ImageHelper(object):
@@ -131,3 +133,5 @@ class ImageHelper(object):
                         (2, 2 * border + 6), (border + 4, 2 * border + 6), (2 * border + 6, 2 * border + 6)]
 
         return border, position
+
+

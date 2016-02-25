@@ -1,6 +1,7 @@
 import flask
+from bson import ObjectId
 from flask import request
-from data.database.Mongo.MongoUser import MongoUser, Info
+from data.database.Mongo.MongoUser import MongoUser, Info, ActivityState
 from data.database.Sql.User import UserInfo
 from data.database.database import mysql
 from src import app
@@ -10,7 +11,7 @@ from util.Encrypt import BcryptPassManager
 from util.decorator_helper import filter_exception
 from util.hx import HxHelper
 from util.image_helper import ImageHelper, PicType
-from util.request_helper import request_bool, request_xp_account
+from util.request_helper import request_bool, request_xp_account, request_all_values
 from util.result_helper import result_success, result_fail, result
 from util.token_helper import filter_token, make_token
 
@@ -20,14 +21,17 @@ from util.token_helper import filter_token, make_token
 def user_register():
     account = request.args.get('account')
     password = request.args.get('password')
-    pic = request.args.get('pic')
 
+    pic = request.args.get('pic')
     pic_path = ImageHelper.base64_to_image(pic, PicType.user)
     if pic_path is None:
-        return result_fail('上传图片错误')
+        # return result_fail('上传图片错误')
+        pic_path = 'test.jpg'
 
     nickname = request.args.get('nickname')
-    sex = request.args.get('sex')
+    sex = request_bool('sex', True)
+    if isinstance(sex, bool) is False:
+        return sex
     province = request.args.get('province')
     city = request.args.get('city')
 
@@ -35,7 +39,7 @@ def user_register():
         pwd = BcryptPassManager.encrypt_pass(password)
         userinfo = UserInfo.query.filter_by(Account=account).first()
         if userinfo is not None:
-            return '该账号已经被注册'
+            return result_fail('该账号已经被注册')
         else:
             if HxHelper.create_account(account, pwd, nickname):
                 user = UserInfo(Account=account, Password=pwd, UserPic=pic_path, NickName=nickname, Sex=sex,
@@ -64,12 +68,10 @@ def user_register():
 
 
 # 02通过密码登陆
-@app.route("/user/login_pass", methods=['get', 'post'])
+@app.route("/user/login/pass", methods=['get', 'post'])
 @filter_exception
 def user_login_pass():
-    account = request.args.get("account")
-    password = request.args.get("password")
-    device_id = request.args.get("device_id")
+    account, password, device_id = request_all_values('account', 'password', 'device_id')
     user = UserInfo.query.filter_by(Account=account).first()
 
     if user is not None and BcryptPassManager.check_valid(password, user.Password):
@@ -113,7 +115,7 @@ def modify_account(token):
     return make_token(uid)
 
 
-# 05通过原始密码修改手机号码
+# 05通过原始密码修改密码
 @app.route("/user/password_pass", methods=['get'])
 @filter_exception
 @filter_token
@@ -130,7 +132,7 @@ def modify_pass_by_pass(token):
         return result_fail('密码输入错误')
 
 
-# 06通过验证码修改手机号码
+# 06通过验证码修改密码
 @app.route("/user/password_code", methods=['get'])
 @filter_exception
 @filter_token
@@ -213,16 +215,55 @@ def set_xp_account(token):
 
 
 # 10发布用户活动
-@app.route('/user/activity', methods=['get'])
+@app.route('/user/activity', methods=['get', 'post'])
 @filter_exception
 @filter_token
-def issue_activity():
-    pass
+def issue_activity(token):
+    content = request.args.get('content')
+    address = request.args.get('address')
+    begin_time = request.args.get('begin_time')
+    pics = request.args.get('pics')
+    pic_array = []
+    # for pic in pics.split('|'):
+    #     pic_path = ImageHelper.base64_to_image(pic, PicType.activity)
+    #     if pic_path is None:
+    #         return result_fail('上传图片错误')
+    #     pic_array.append(pic_path)
+    activity_state = ActivityState(active_type=3, object_id=ObjectId(), content=content, pics=pic_array,
+                                   address=address,
+                                   begin_time=begin_time)
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+    return result_success('发布活动成功')
 
 
 # 11发布用户动态
-@app.route('/user/dynamic', methods=['get'])
+@app.route('/user/dynamic', methods=['get', 'post'])
 @filter_exception
 @filter_token
-def issue_dynamic():
-    pass
+def issue_dynamic(token):
+    is_friend = request.args.get('is_friend') if True else request.form.get('is_friend')
+    if is_friend == 'true':
+        is_friend = True
+    else:
+        is_friend = False
+    is_city = request.args.get('is_city') if True else request.form.get('is_city')
+    if is_city == 'true':
+        is_city = True
+    else:
+        is_city = False
+    content = request.args.get('content')
+    address = request.args.get('address')
+    log = request.args.get('log')
+    lat = request.args.get('lat')
+    pics = request.args.get('pics')
+    pic_array = []
+    # for pic in pics.split('|'):
+    #     pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
+    #     if pic_path is None:
+    #         return result_fail('上传图片错误')
+    #     pic_array.append(pic_path)
+    activity_state = ActivityState(active_type=4, object_id=ObjectId(), content=content, pics=pic_array,
+                                   address=address,
+                                   longitude=log, latitude=lat, is_friend=is_friend, is_city=is_city)
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+    return result_success('发布动态成功')

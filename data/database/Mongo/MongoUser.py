@@ -12,7 +12,7 @@ class Token(EmbeddedDocument):
 
 
 class Info(EmbeddedDocument):
-    xp_account = StringField(unique=True)
+    xp_account = StringField()
     pic = StringField(required=True)
     nickname = StringField(required=True)
     signature = StringField(default='')
@@ -33,23 +33,40 @@ class InterruptComment(EmbeddedDocument):
     user_id = IntField()
 
 
-class Posture(EmbeddedDocument):
-    time = mongo.DateTimeField(default=datetime.datetime.now())
-    content = StringField()
-    pic = StringField()
+# class Posture(EmbeddedDocument):
+#     time = mongo.DateTimeField(default=datetime.datetime.now())
+#     content = StringField()
+#     pic = StringField()
 
 
 class ActivityState(EmbeddedDocument):
     object_id = ObjectIdField()
-    type = IntField(choices=active_state_type)
+    active_type = IntField(choices=active_state_type)
     interrupt_comment = EmbeddedDocumentField(InterruptComment)
     content = StringField()
-    posture = ListField(EmbeddedDocumentField(Posture), default=list)
+    # posture = ListField(EmbeddedDocumentField(Posture))
     raise_up = ListField(IntField(), default=list)
     address = StringField()
     pics = ListField(StringField(), default=list)
     longitude = StringField()
     latitude = StringField()
+    # 活动态添加时间
+    add_time = mongo.DateTimeField(required=True, default=datetime.datetime.now())
+    # 个人发布活动开始时间
+    begin_time = StringField()
+    # 推荐 参加 活动id
+    activity_id = ObjectIdField()
+    # 是否城市可见
+    is_city = BooleanField(default=False)
+    # 是否好友可见
+    is_friend = BooleanField(default=False)
+
+
+class ActivityNum(EmbeddedDocument):
+    interrupt_num = IntField(required=True, default=0)
+    raise_num = IntField(required=True, default=0)
+    attend_num = IntField(required=True, default=0)
+    comment_num = IntField(required=True, default=0)
 
 
 class MongoUser(mongo.Document):
@@ -61,11 +78,11 @@ class MongoUser(mongo.Document):
     activity_collect = ListField(ObjectIdField(), default=list)
     info = EmbeddedDocumentField(Info, required=True)
     activity_state = ListField(EmbeddedDocumentField(ActivityState), default=list)
-
     meta = {
         'collection': 'user_info',
         'indexes': [
             'info.hx_account',
-            'activity_state.object_id'
+            'activity_state.object_id',
+            'activity_state.add_time'
         ]
     }

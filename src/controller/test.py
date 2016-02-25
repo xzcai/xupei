@@ -2,11 +2,14 @@ import datetime
 from functools import wraps
 
 import time
-from flask import render_template
+from flask import render_template, request
+from sqlalchemy.util.compat import cmp
 
 from data.database.Mongo.City import City
+from data.database.Mongo.test import TestData, Tes
 from src import app
 from util.image_helper import ImageHelper
+from util.request_helper import request_all_values
 from util.result_helper import result_fail
 
 
@@ -106,29 +109,84 @@ def dd():
 
 @app.route("/test")
 def testdd():
-    timeStamp = 1454307666.5104613
-    timeArray = time.localtime(timeStamp)
-    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-    print('========',otherStyleTime)
+    dict = [
+        {'id': '4', 'name': 'b'},
+        {'id': '6', 'name': 'c'},
+        {'id': '3', 'name': 'a'},
+        {'id': '1', 'name': 'g'},
+        {'id': '8', 'name': 'f'}
+    ]
 
-    print('aaa=====', time.time())
+    # dict.sort(lambda x, y: cmp(x['id'], y['id']))
+    dict1 = sorted(dict, key=lambda x: x['id'])
 
-
-    format = '%Y-%m-%d %H:%M:%S'
-    x = time.localtime(1317091800.0)
-    dt = time.strftime(format, x)
-    print(dt, type(x))
-    funcc('a', 'b', 'c')
+    print(dict1)
     return 'ok'
 
 
-def funcc(*name):
-    return 'ok1111'
-    for n in name:
-        print(n)
-    print(len(name))
-    print(name)
-    return True, False
+@app.route("/test1")
+def test11():
+    data = TestData(num=3, str_data='aaaa')
+    data = TestData(num=4, str_data='aaaa')
+    Tes(code='1', name='cxz', age=22, arr_list=[data, data]).save()
+    return 'sdfasdfsafasf'
+
+
+@app.route("/test2")
+def test12():
+    map_f = """
+        function() {
+            if(this.age>20)
+                emit(this.age,{count:1})
+        };
+    """
+    reduce_f = """
+        function(key,values) {
+            if(key>0)
+            {
+                var ret = {age:key, names:values}
+                return ret
+            }
+        };
+    """
+    finalize_f = """
+        function(key,values) {
+            if(key>23){
+                values.msg="你都25岁了"
+            }
+            return values
+        };
+    """
+
+    list_obj = list(Tes.objects().map_reduce(map_f, reduce_f, 'inline', finalize_f=finalize_f))
+    print(list_obj)
+
+    for o in Tes.objects().map_reduce(map_f=map_f, reduce_f=reduce_f, output={'replace': 'COLLECTION_NAME'},
+                                      finalize_f=finalize_f):
+        print(o.key, o.value)
+    return 'ok'
+
+
+@app.route("/test3")
+def test3():
+    n,m = request_all_values('name1','name2')
+    if m is None:
+        print('none')
+    if m:
+        print('sdfsdfsdf')
+    if n:
+        print('123456000000')
+    print(n,m)
+
+
+    return '0k'
+
+
+def test4():
+    a=[1,3,4]
+
+    a.append(5)
+    return a
 
 
 def test():
