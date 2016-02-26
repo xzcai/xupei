@@ -89,6 +89,7 @@ def img_test(pics, length=140):
     return border, position
 
 
+
 def clipimage(size):
     width = int(size[0])
     height = int(size[1])
