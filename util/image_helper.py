@@ -41,20 +41,23 @@ class ImageHelper(object):
             return None
 
         try:
-            img = open('./imgs/' + pic_type + '/' + str(pic_name) + '.jpg', 'wb')
+            img = open('./src/static/imgs/' + pic_type + '/' + str(pic_name) + '.jpg', 'wb')
             img.write(img_data)
-            return '/imgs/' + pic_type + '/' + str(pic_name) + '.jpg'
+            return '/static/imgs/' + pic_type + '/' + str(pic_name) + '.jpg'
         except Exception as e:
             print(e, '图片存储保存出错')
             return None
         finally:
-            img.close()
+            try:
+                img.close()
+            except Exception as e:
+                pass
 
     # 生成九宫格图片
     @staticmethod
     def sudoku_pic(pics, qid):
         try:
-            img_path = '/imgs/qun/' + qid + '.jpg'
+            img_path = '/static/imgs/qun/' + qid + '.jpg'
             merge_img = Image.new('RGB', (ImageHelper.__border, ImageHelper.__border), 0x808080)
             if len(pics) == 1:
                 return pics[0]

@@ -19,42 +19,39 @@ from util.token_helper import filter_token, make_token
 # 01用户注册
 @app.route("/user/register", methods=['get', 'post'])
 def user_register():
-    account = request.args.get('account')
-    password = request.args.get('password')
+    account, password, pic, nickname, sex, province, city = request_all_values('account', 'password', 'pic', 'nickname',
+                                                                               'sex', 'province', 'city')
 
-    pic = request.args.get('pic')
+    userinfo = UserInfo.query.filter_by(Account=account).first()
+    if userinfo is not None:
+        return result_fail('该账号已经被注册')
+
     pic_path = ImageHelper.base64_to_image(pic, PicType.user)
     if pic_path is None:
         # return result_fail('上传图片错误')
-        pic_path = 'test.jpg'
+        pic_path = '/static/imgs/user/10.jpg'
+    if sex == '1':
+        sex = True
+    else:
+        sex = False
 
-    nickname = request.args.get('nickname')
-    sex = request_bool('sex', True)
-    if isinstance(sex, bool) is False:
-        return sex
-    province = request.args.get('province')
-    city = request.args.get('city')
+    pwd = BcryptPassManager.encrypt_pass(password)
 
     try:
-        pwd = BcryptPassManager.encrypt_pass(password)
-        userinfo = UserInfo.query.filter_by(Account=account).first()
-        if userinfo is not None:
-            return result_fail('该账号已经被注册')
+        if HxHelper.create_account(account, pwd, nickname):
+            user = UserInfo(Account=account, Password=pwd, UserPic=pic_path, NickName=nickname, Sex=sex,
+                            Province=province, City=city, HX_Account=account, HX_Password=pwd)
+            mysql.session.add(user)
+            mysql.session.commit()
+            print(user.Account)
+            info = Info(pic=user.UserPic, nickname=user.NickName, sex=user.Sex, province=user.Province,
+                        city=user.City, hx_account=user.HX_Account, hx_password=user.HX_Password)
+            mongo_user = MongoUser(mysql_id=user.ID, info=info, token={})
+            mongo_user.save()
+
+            return result_success('注册成功')
         else:
-            if HxHelper.create_account(account, pwd, nickname):
-                user = UserInfo(Account=account, Password=pwd, UserPic=pic_path, NickName=nickname, Sex=sex,
-                                Province=province, City=city, HX_Account=account, HX_Password=pwd)
-                mysql.session.add(user)
-                mysql.session.commit()
-
-                info = Info(pic=user.UserPic, nickname=user.NickName, sex=user.Sex, province=user.Province,
-                            city=user.City, hx_account=user.HX_Account, hx_password=user.HX_Password)
-                mongo_user = MongoUser(mysql_id=user.ID, info=info, token={})
-                mongo_user.save()
-
-                return result_success('注册成功')
-            else:
-                return result_fail('集成环信失败')
+            return result_fail('集成环信失败')
     except Exception as e:
         try:
             HxHelper.delete_account(account)

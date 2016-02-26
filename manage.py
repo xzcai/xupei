@@ -1,6 +1,8 @@
+
 from flask_script import Manager, Server
 
 from src import app
+
 manager = Manager(app)
 manager.add_command("runserver", Server('0.0.0.0', port=8878))
 

@@ -1,4 +1,5 @@
 import datetime
+from encodings.utf_8 import encode
 from functools import wraps
 
 import time
@@ -11,7 +12,6 @@ from src import app
 from util.image_helper import ImageHelper
 from util.request_helper import request_all_values
 from util.result_helper import result_fail
-
 
 def deco1(func):
     @wraps
@@ -129,7 +129,7 @@ def test11():
     data = TestData(num=3, str_data='aaaa')
     data = TestData(num=4, str_data='aaaa')
     Tes(code='1', name='cxz', age=22, arr_list=[data, data]).save()
-    return 'sdfasdfsafasf'
+    return 's11111df中国sdfsasdfsdfasf'.decode('gbk', 'ignore').encode('utf-8')
 
 
 @app.route("/test2")

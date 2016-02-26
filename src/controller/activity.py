@@ -18,6 +18,8 @@ from util.token_helper import filter_token
 
 # 活动属性排序
 def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, latitude=None):
+    print(page_index)
+    print(page_size)
     if sort_attribute == Activity_Attribute.hot:
         objs = Activity.objects(where).order_by('-statistics.attend_count').exclude('tickets')
     elif sort_attribute == Activity_Attribute.recommend:
@@ -40,9 +42,11 @@ def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, 
         objs = Activity.objects(where).order_by('create_time').exclude('tickets')
     else:
         objs = Activity.objects(where).order_by('create_time').exclude('tickets')
-    index = int(page_index) - 1
+
     size = int(page_size)
-    return objs.skip(index * size).limit(size)
+    num = (int(page_index) - 1) * size
+    return objs
+    return objs.skip(num).limit(size)
 
 
 # 整合数据，去除无用数据
@@ -99,7 +103,7 @@ def activity_sponsor(token):
         where = where & Q(begin_time__gte=stamp_to_time(date)) & Q(
                 begin_time__lt=stamp_to_time(date) + datetime.timedelta(1))
     if attribute is not None:
-        objs = activity_sort(attribute, where, page_size, page_index, longitude, latitude)
+        objs = activity_sort(attribute, where, page_index, page_size, longitude, latitude)
     # 首页
     else:
         objs = Activity.objects(where).order_by('-statistics.attend_count').order_by(
@@ -115,14 +119,18 @@ def activity_sponsor(token):
 @filter_exception
 @filter_token
 def activity_queue(token):
-    label = request.args.get('label')
-    attribute = request.args.get("attribute")
-    date = request.args.get('date')
-    city_id = request.args.get("city_id")
-    page_size = request.args.get("page_size", '1')
-    page_index = request.args.get("page_index", '50')
-    longitude = request.args.get("longitude", '')
-    latitude = request.args.get("latitude", '')
+    label, attribute, date, city_id, page_size, page_index, longitude, latitude = request_all_values('label',
+                                                                                                     'attribute',
+                                                                                                     'date',
+                                                                                                     'city_id',
+                                                                                                     'page_size',
+                                                                                                     'page_index',
+                                                                                                     'longitude',
+                                                                                                     'latitude')
+    if page_size is None:
+        page_size = 30
+    if page_index is None:
+        page_index = 1
 
     where = Q(creator_info__creator_type=1) & Q(address__city_id=city_id) & Q(
             queue_begin_time__gt=datetime.datetime.now())
@@ -221,7 +229,7 @@ def issue():
         creator_info = ActivityCreator(name='咕噜米', pic='1.jpg', id=2, creator_type=1)
         Activity(title="这是队列活动", address=address, pics=['1.jpg', '2.jpg'], hx_group_id='123456789',
                  labels=['旅游', '沙发'], creator_info=creator_info, is_free=True,
-                 queue_begin_time=[datetime.datetime.now()]).save()
+                 queue_begin_time=[datetime.datetime.now() + datetime.timedelta(seconds=3600 * 24 * 2)]).save()
     return 'ok'
 
 
