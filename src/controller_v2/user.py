@@ -1,3 +1,4 @@
+# -*- coding:gbk -*-
 import flask
 from bson import ObjectId
 from flask import request
@@ -6,7 +7,7 @@ from data.database.Sql.User import UserInfo
 from data.database.database import mysql
 from src import app
 from src.bll.user_bll import modify_password
-from src.controller.phone import verify_bll
+from src.controller_v2.phone import verify_bll
 from util.Encrypt import BcryptPassManager
 from util.decorator_helper import filter_exception
 from util.hx import HxHelper
@@ -16,7 +17,7 @@ from util.result_helper import result_success, result_fail, result
 from util.token_helper import filter_token, make_token
 
 
-# 01ç”¨æˆ·æ³¨å†Œ
+# 01ÓÃ»§×¢²á
 @app.route("/user/register", methods=['get', 'post'])
 def user_register():
     account, password, pic, nickname, sex, province, city = request_all_values('account', 'password', 'pic', 'nickname',
@@ -24,11 +25,11 @@ def user_register():
 
     userinfo = UserInfo.query.filter_by(Account=account).first()
     if userinfo is not None:
-        return result_fail('è¯¥è´¦å·å·²ç»è¢«æ³¨å†Œ')
+        return result_fail('¸ÃÕËºÅÒÑ¾­±»×¢²á')
 
     pic_path = ImageHelper.base64_to_image(pic, PicType.user)
     if pic_path is None:
-        # return result_fail('ä¸Šä¼ å›¾ç‰‡é”™è¯¯')
+        # return result_fail('ÉÏ´«Í¼Æ¬´íÎó')
         pic_path = '/static/imgs/user/10.jpg'
     if sex == '1':
         sex = True
@@ -43,15 +44,15 @@ def user_register():
                             Province=province, City=city, HX_Account=account, HX_Password=pwd)
             mysql.session.add(user)
             mysql.session.commit()
-            print(user.Account)
+
             info = Info(pic=user.UserPic, nickname=user.NickName, sex=user.Sex, province=user.Province,
                         city=user.City, hx_account=user.HX_Account, hx_password=user.HX_Password)
             mongo_user = MongoUser(mysql_id=user.ID, info=info, token={})
             mongo_user.save()
 
-            return result_success('æ³¨å†ŒæˆåŠŸ')
+            return result_success('×¢²á³É¹¦')
         else:
-            return result_fail('é›†æˆç¯ä¿¡å¤±è´¥')
+            return result_fail('¼¯³É»·ĞÅÊ§°Ü')
     except Exception as e:
         try:
             HxHelper.delete_account(account)
@@ -64,7 +65,7 @@ def user_register():
         return result_fail(str(e))
 
 
-# 02é€šè¿‡å¯†ç ç™»é™†
+# 02Í¨¹ıÃÜÂëµÇÂ½
 @app.route("/user/login/pass", methods=['get', 'post'])
 @filter_exception
 def user_login_pass():
@@ -74,16 +75,16 @@ def user_login_pass():
     if user is not None and BcryptPassManager.check_valid(password, user.Password):
         mongo_user = MongoUser.objects(mysql_id=user.ID).first()
         if mongo_user is None:
-            return result_fail('æ•°æ®æœ‰è¯¯ï¼Œè¯·è”ç³»å®¢æœ')
+            return result_fail('Êı¾İÓĞÎó£¬ÇëÁªÏµ¿Í·ş')
         if mongo_user.info.is_verify and mongo_user.info.device_id != device_id:
-            return result_fail('æ‚¨å¼€å¯è¿‡è®¾å¤‡ä¿æŠ¤ï¼Œè¯¥è®¾å¤‡ä¸æ˜¯å¸¸ç”¨è®¾å¤‡')
+            return result_fail('Äú¿ªÆô¹ıÉè±¸±£»¤£¬¸ÃÉè±¸²»ÊÇ³£ÓÃÉè±¸')
         else:
             return make_token(user.ID)
     else:
-        return result_fail('è´¦å·æˆ–å¯†ç é”™è¯¯')
+        return result_fail('ÕËºÅ»òÃÜÂë´íÎó')
 
 
-# 03é€šè¿‡éªŒè¯ç ç™»é™†
+# 03Í¨¹ıÑéÖ¤ÂëµÇÂ½
 @app.route("/user/login_code", methods=['get'])
 @filter_exception
 def user_login_code():
@@ -96,7 +97,7 @@ def user_login_code():
     return make_token(user.ID)
 
 
-# 04ä¿®æ”¹æ³¨å†Œè´¦å·
+# 04ĞŞ¸Ä×¢²áÕËºÅ
 @app.route("/user/account", methods=['get'])
 @filter_exception
 @filter_token
@@ -112,7 +113,7 @@ def modify_account(token):
     return make_token(uid)
 
 
-# 05é€šè¿‡åŸå§‹å¯†ç ä¿®æ”¹å¯†ç 
+# 05Í¨¹ıÔ­Ê¼ÃÜÂëĞŞ¸ÄÃÜÂë
 @app.route("/user/password_pass", methods=['get'])
 @filter_exception
 @filter_token
@@ -126,10 +127,10 @@ def modify_pass_by_pass(token):
     if BcryptPassManager.check_valid(origin_pass, user.Password):
         return modify_password(uid, BcryptPassManager.encrypt_pass(new_pass))
     else:
-        return result_fail('å¯†ç è¾“å…¥é”™è¯¯')
+        return result_fail('ÃÜÂëÊäÈë´íÎó')
 
 
-# 06é€šè¿‡éªŒè¯ç ä¿®æ”¹å¯†ç 
+# 06Í¨¹ıÑéÖ¤ÂëĞŞ¸ÄÃÜÂë
 @app.route("/user/password_code", methods=['get'])
 @filter_exception
 @filter_token
@@ -139,7 +140,7 @@ def modify_pass_by_code(token):
     return modify_password(uid, BcryptPassManager.encrypt_pass(new_pass))
 
 
-# 07è®¾ç½®è´¦æˆ·ä¿æŠ¤
+# 07ÉèÖÃÕË»§±£»¤
 @app.route('/user/protect', methods=['get'])
 @filter_exception
 @filter_token
@@ -152,48 +153,48 @@ def set_protect(token):
     else:
         type = False
     MongoUser.objects(mysql_id=uid).update_one(info__device_id=device_id, info__is_protect=type)
-    return result_success("è®¾ç½®æˆåŠŸ")
+    return result_success("ÉèÖÃ³É¹¦")
 
 
-# 08è®¾ç½®ç”¨æˆ·ä¿¡æ¯
+# 08ÉèÖÃÓÃ»§ĞÅÏ¢
 @app.route('/user/info', methods=['get'])
 @filter_exception
 @filter_token
 def set_info(token):
     uid = token['id']
 
-    # ä¿®æ”¹æ˜µç§°
+    # ĞŞ¸ÄêÇ³Æ
     nickname = request.args.get('nickname')
     if nickname is not None:
         MongoUser.objects(mysql_id=uid).update_one(info__nickname=nickname)
 
-    # ä¿®æ”¹å¤´åƒ
+    # ĞŞ¸ÄÍ·Ïñ
     pic = request.args.get('pic')
     if pic is not None:
         MongoUser.objects(mysql_id=uid).update_one(info__pic=pic)
 
-    # ä¿®æ”¹ä¸ªæ€§ç­¾å
+    # ĞŞ¸Ä¸öĞÔÇ©Ãû
     signature = request.args.get('signature')
     if signature is not None:
         MongoUser.objects(mysql_id=uid).update_one(info__signature=signature)
 
-    # ä¿®æ”¹æ€§åˆ«
+    # ĞŞ¸ÄĞÔ±ğ
     sex = request_bool('sex', False)
     if isinstance(sex, bool):
         MongoUser.objects(mysql_id=uid).update_one(info__sex=sex)
     else:
         return sex
 
-    # ä¿®æ”¹çœå¸‚
+    # ĞŞ¸ÄÊ¡ÊĞ
     province = request.args.get('province')
     city = request.args.get('city')
     if province is not None and city is not None:
         MongoUser.objects(mysql_id=uid).update_one(info__province=province, info__city=city)
 
-    return result_success('ä¿®æ”¹æˆåŠŸ')
+    return result_success('ĞŞ¸Ä³É¹¦')
 
 
-# 09è®¾ç½®è®¸é™ªå·
+# 09ÉèÖÃĞíÅãºÅ
 @app.route('/user/xp_account', methods=['get'])
 @filter_exception
 @filter_token
@@ -206,61 +207,58 @@ def set_xp_account(token):
     user = MongoUser.objects(mysql_id=uid).only('info').first()
     if user.info.xp_account is None:
         MongoUser.objects(mysql_id=uid).update_one(info__xp_account=xp_account)
-        return result_success('è®¸é™ªå·è®¾ç½®æˆåŠŸ')
+        return result_success('ĞíÅãºÅÉèÖÃ³É¹¦')
     else:
-        return result_fail('è®¸é™ªå·åªèƒ½è®¾ç½®ä¸€æ¬¡ï¼Œä¸èƒ½åœ¨é‡æ–°è®¾ç½®')
+        return result_fail('ĞíÅãºÅÖ»ÄÜÉèÖÃÒ»´Î£¬²»ÄÜÔÚÖØĞÂÉèÖÃ')
 
 
-# 10å‘å¸ƒç”¨æˆ·æ´»åŠ¨
+# 10·¢²¼ÓÃ»§»î¶¯
 @app.route('/user/activity', methods=['get', 'post'])
 @filter_exception
 @filter_token
 def issue_activity(token):
-    content = request.args.get('content')
-    address = request.args.get('address')
-    begin_time = request.args.get('begin_time')
-    pics = request.args.get('pics')
+    is_friend, is_city, content, address, begin_time, pics = request_all_values('is_friend', 'is_city', 'content',
+                                                                                'address', 'begin_time', 'pics')
     pic_array = []
-    # for pic in pics.split('|'):
-    #     pic_path = ImageHelper.base64_to_image(pic, PicType.activity)
-    #     if pic_path is None:
-    #         return result_fail('ä¸Šä¼ å›¾ç‰‡é”™è¯¯')
-    #     pic_array.append(pic_path)
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.activity)
+            if pic_path is None:
+                return result_fail('ÉÏ´«Í¼Æ¬´íÎó')
+            pic_array.append(pic_path)
+    if is_friend == 'true':
+        is_friend = True
+    if is_city == 'true':
+        is_city = True
+
     activity_state = ActivityState(active_type=3, object_id=ObjectId(), content=content, pics=pic_array,
-                                   address=address,
-                                   begin_time=begin_time)
+                                   address=address, begin_time=begin_time, is_friend=is_friend, is_city=is_city)
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
-    return result_success('å‘å¸ƒæ´»åŠ¨æˆåŠŸ')
+    return result_success('·¢²¼»î¶¯³É¹¦')
 
 
-# 11å‘å¸ƒç”¨æˆ·åŠ¨æ€
+# 11·¢²¼ÓÃ»§¶¯Ì¬
 @app.route('/user/dynamic', methods=['get', 'post'])
 @filter_exception
 @filter_token
 def issue_dynamic(token):
-    is_friend = request.args.get('is_friend') if True else request.form.get('is_friend')
+    is_friend, is_city, content, address, log, lat, pics = request_all_values('is_friend', 'is_city', 'content',
+                                                                              'address', 'log', 'lat', 'pics')
     if is_friend == 'true':
         is_friend = True
-    else:
-        is_friend = False
-    is_city = request.args.get('is_city') if True else request.form.get('is_city')
     if is_city == 'true':
         is_city = True
-    else:
-        is_city = False
-    content = request.args.get('content')
-    address = request.args.get('address')
-    log = request.args.get('log')
-    lat = request.args.get('lat')
-    pics = request.args.get('pics')
+
     pic_array = []
-    # for pic in pics.split('|'):
-    #     pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
-    #     if pic_path is None:
-    #         return result_fail('ä¸Šä¼ å›¾ç‰‡é”™è¯¯')
-    #     pic_array.append(pic_path)
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.activity)
+            if pic_path is None:
+                return result_fail('ÉÏ´«Í¼Æ¬´íÎó')
+            pic_array.append(pic_path)
+
     activity_state = ActivityState(active_type=4, object_id=ObjectId(), content=content, pics=pic_array,
                                    address=address,
                                    longitude=log, latitude=lat, is_friend=is_friend, is_city=is_city)
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
-    return result_success('å‘å¸ƒåŠ¨æ€æˆåŠŸ')
+    return result_success('·¢²¼¶¯Ì¬³É¹¦')

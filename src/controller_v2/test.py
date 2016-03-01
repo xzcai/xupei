@@ -3,15 +3,25 @@ from encodings.utf_8 import encode
 from functools import wraps
 
 import time
+
+from bson import ObjectId
 from flask import render_template, request
 from sqlalchemy.util.compat import cmp
 
+from data.database.Mongo.ActivityStateMsg import ActivityStateMsg
 from data.database.Mongo.City import City
+from data.database.Mongo.DynamicComment import DynamicComment
+from data.database.Mongo.MongoUser import MongoUser
 from data.database.Mongo.test import TestData, Tes
+from data.database.Sql.User import UserInfo
 from src import app
+from util.Encrypt import BcryptPassManager
+from util.decorator_helper import filter_exception
 from util.image_helper import ImageHelper
 from util.request_helper import request_all_values
 from util.result_helper import result_fail
+from util.token_helper import make_token
+
 
 def deco1(func):
     @wraps
@@ -107,7 +117,11 @@ def clipimage(size):
 
 @app.route("/con/test")
 def dd():
-    return render_template('index.html')
+    # user = MongoUser(mysql_id=229)
+    # DynamicComment(dynamic_id=ObjectId(), content='tou nsn',com_uid=user,obj_uid=user).save()
+    d =DynamicComment.objects(dynamic_id='56d2a3cc94a7c05075c171f9').first()
+    print(d.com_uid)
+    return 'ok'
 
 
 @app.route("/test")
@@ -171,18 +185,23 @@ def test12():
 
 
 @app.route("/test3")
+@app.route("/user/login/pass", methods=['get', 'post'])
+@filter_exception
 def test3():
-    n,m = request_all_values('name1','name2')
-    if m is None:
-        print('none')
-    if m:
-        print('sdfsdfsdf')
-    if n:
-        print('123456000000')
-    print(n,m)
-
-
-    return '0k'
+    account, password, device_id = request_all_values('account', 'password', 'device_id')
+    user = UserInfo.query.filter_by(Account=account).first()
+    print(11111111111111111111111111111111111111111111111111111111111111111111,user.ID)
+    print(22222222222222222222222222222222222222222222222222222222222222222222,len(MongoUser.objects()))
+    if user is not None and BcryptPassManager.check_valid(password, user.Password):
+        mongo_user = MongoUser.objects(mysql_id=user.ID).first()
+        if mongo_user is None:
+            return result_fail('数据有误，请联系客服')
+        if mongo_user.info.is_verify and mongo_user.info.device_id != device_id:
+            return result_fail('您开启过设备保护，该设备不是常用设备')
+        else:
+            return make_token(user.ID)
+    else:
+        return result_fail('账号或密码错误')
 
 
 def test4():

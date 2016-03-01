@@ -1,9 +1,12 @@
 from mongoengine import StringField, ListField, IntField, ReferenceField, ObjectIdField, EmbeddedDocumentField, \
-    EmbeddedDocument, BooleanField
+    EmbeddedDocument, BooleanField, Document
+
+from data.database.Mongo.Activity import Activity
+# from data.database.Mongo.DynamicComment import DynamicComment
 from data.database.database import mongo
 import datetime
 
-from util.macro import code_send_mean, active_state_type
+from util.macro import active_state_type
 
 
 class Token(EmbeddedDocument):
@@ -27,8 +30,8 @@ class Info(EmbeddedDocument):
     is_protect = BooleanField(default=False)
 
 
-class InterruptComment(EmbeddedDocument):
-    time = mongo.DateTimeField(default=datetime.datetime.now())
+class Interrupt(EmbeddedDocument):
+    add_time = mongo.DateTimeField(default=datetime.datetime.now())
     content = StringField()
     user_id = IntField()
 
@@ -42,10 +45,11 @@ class InterruptComment(EmbeddedDocument):
 class ActivityState(EmbeddedDocument):
     object_id = ObjectIdField()
     active_type = IntField(choices=active_state_type)
-    interrupt_comment = EmbeddedDocumentField(InterruptComment)
+    interrupt = EmbeddedDocumentField(Interrupt)
     content = StringField()
     # posture = ListField(EmbeddedDocumentField(Posture))
-    raise_up = ListField(IntField(), default=list)
+    raise_up = ListField(ReferenceField('MongoUser'))  # ListField(IntField(), default=list)
+
     address = StringField()
     pics = ListField(StringField(), default=list)
     longitude = StringField()
@@ -55,7 +59,7 @@ class ActivityState(EmbeddedDocument):
     # 个人发布活动开始时间
     begin_time = StringField()
     # 推荐 参加 活动id
-    activity_id = ObjectIdField()
+    activity = ReferenceField(Activity)
     # 是否城市可见
     is_city = BooleanField(default=False)
     # 是否好友可见
@@ -69,7 +73,13 @@ class ActivityNum(EmbeddedDocument):
     comment_num = IntField(required=True, default=0)
 
 
-class MongoUser(mongo.Document):
+class MessageInfo(EmbeddedDocument):
+    user = ReferenceField('MongoUser')
+    add_time = mongo.DateTimeField(required=True, default=datetime.datetime.now())
+    type = IntField(choices=(1, 2, 3, 4, 5))  # 1= 插话；2=点赞；3=参加；4=评论
+
+
+class MongoUser(Document):
     mysql_id = IntField(primary_key=True)
     token = EmbeddedDocumentField(Token)
     friends = ListField(IntField(), default=list)
@@ -78,6 +88,7 @@ class MongoUser(mongo.Document):
     activity_collect = ListField(ObjectIdField(), default=list)
     info = EmbeddedDocumentField(Info, required=True)
     activity_state = ListField(EmbeddedDocumentField(ActivityState), default=list)
+    message_info = ListField(EmbeddedDocumentField(MessageInfo))
     meta = {
         'collection': 'user_info',
         'indexes': [

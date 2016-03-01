@@ -8,19 +8,35 @@ from flask import request
 from flask.ext.mongoengine import unicode
 
 from data.database.Mongo.MongoUser import MongoUser, Token
+from util.Encrypt import BcryptPassManager
 from util.result_helper import result_success, result_fail
 
 
 # （在登陆，注册，修改密码时）创建token 并保存token
 def make_token(user_id):
-    pass
     try:
+        # 创建token
+        token_value = BcryptPassManager.encrypt_pass(str(user_id))
+        # 查找用户信息
         user = MongoUser.objects(mysql_id=user_id).first()
-        token_helper = TokenHelper(user_id, user.info.hx_account)
-        token_value = token_helper.encrypt()
+        # 保存token
         token = Token(value=token_value)
         MongoUser.objects(mysql_id=user_id).update(token=token)
-        return result_success('成功', {'token': token_value, 'user_info': user.info})
+        info = {
+            'uid': user_id,
+            'pic': user.info.pic,
+            'nickname': user.info.nickname,
+            'signature': user.info.signature,
+            'sex': user.info.sex,
+            'province': user.info.province,
+            'city': user.info.city,
+            'origin': user.info.user_origin,
+            'hx_account': user.info.hx_account,
+            'hx_password': user.info.hx_password,
+            'is_verify': user.info.is_verify,
+            'is_protect': user.info.is_protect
+        }
+        return result_success('成功', {'token': token_value, 'user_info': info})
     except Exception as e:
         print('创建保存token时出错', e)
         return result_fail('失败，创建token时出现异常')
@@ -37,9 +53,22 @@ def filter_token(func):
         if token is None:
             return result_fail('token 参数是必须的')
 
-        data = TokenHelper.decrypt(token)
-        if data is None:
-            return result_fail('token 无效或过期，请重新登陆')
+        user = MongoUser.objects(token__value=token).first()
+        if user is None:
+            return result_fail('token 无效')
+        else:
+            if user.token.due_time < datetime.datetime.now():
+                return result_fail('token 已经过期，请重新登陆获取token')
+
+        data = {
+            'id': user.mysql_id,
+            'hx_account': user.info.hx_account,
+            'nickname': user.info.nickname,
+            'pic': user.info.pic
+        }
+        # data = TokenHelper.decrypt(token)
+        # if data is None:
+        #     return result_fail('token 无效或过期，请重新登陆')
         # else:
         #     if data['past_time'] < time.mktime(datetime.datetime.now()):
         #         return result_fail('token 无效或过期，请重新登陆')
@@ -60,6 +89,7 @@ class TokenHelper(object):
         content = {'id': self.__id, 'hx_account': self.__hx_account, 'past_time': time.mktime(past_time)}
         return content
 
+    # 加密
     def encrypt(self):
         content = self.content()
         encoded = jwt.encode(content, TokenHelper.__key, algorithm='HS256')

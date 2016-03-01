@@ -9,6 +9,7 @@ from src import app
 from src.bll.activity_bll import is_collection
 from util.calculate_distance import calc_distance
 from util.decorator_helper import filter_exception
+from util.image_helper import ImageHelper, PicType
 from util.macro import Activity_Attribute
 from util.request_helper import request_all_values
 from util.result_helper import result_success, result_fail
@@ -18,8 +19,6 @@ from util.token_helper import filter_token
 
 # 活动属性排序
 def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, latitude=None):
-    print(page_index)
-    print(page_size)
     if sort_attribute == Activity_Attribute.hot:
         objs = Activity.objects(where).order_by('-statistics.attend_count').exclude('tickets')
     elif sort_attribute == Activity_Attribute.recommend:
@@ -137,8 +136,9 @@ def activity_queue(token):
     if label:
         where = where & Q(labels=label)
     if date:
-        where = where & Q(begin_time__gte=stamp_to_time(date)) & Q(
-                begin_time__lt=stamp_to_time(date) + datetime.timedelta(1))
+        begin_time = stamp_to_time(date)
+        where = where & Q(queue_begin_time__gte=begin_time) & Q(
+                queue_begin_time__lt=begin_time + datetime.timedelta(1))
 
     objs = activity_sort(attribute, where, page_size, page_index, longitude, latitude)
     data = []
@@ -150,15 +150,54 @@ def activity_queue(token):
 
 # 获取活动详情
 @app.route("/activity/detail", methods=['GET'])
-def get_detail():
-    pass
+@filter_exception
+@filter_token
+def get_detail(token):
+    id = request_all_values('id')
+    activity = Activity.objects(id=id).first()
+    data = {
+        'id': id,
+        'hx_qid': activity.hx_group_id,
+        'creator_info': activity.creator_info,
+        'labels': activity.labels,
+        'attend_count': activity.statistics.attend_count,
+        'recommend_count': activity.statistics.recommend_count
+    }
+    return result_success('成功', data)
 
 
 # 参加活动
 @app.route("/activity/attend", methods=["GET", "POST"])
-def attend():
-    # aid = request.args.get("aid")
-    pass
+@filter_exception
+@filter_token
+def attend(token):
+    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
+    pic_array = []
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
+            if pic_path is None:
+                return result_fail('上传图片错误')
+            pic_array.append(pic_path)
+
+    if is_friend == 'true':
+        is_friend = True
+    if is_city == 'true':
+        is_city = True
+
+    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
+                            activity_state__active_type=2).first()
+    if obj is not None:
+        return result_fail('已经参加过该活动')
+    # 构建推荐对像
+    activity = Activity(id=aid)
+    activity_state = ActivityState(active_type=2, object_id=ObjectId(), content=content, pics=pic_array,
+                                   activity=activity, is_city=is_city, is_friend=is_friend)
+    # 推荐到活动态
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+    # 添加活动添加数
+    Activity.objects(id=aid).update(inc__statistics__attend_count=1)
+    return result_success('推荐活动成功')
 
 
 # 推荐活动
@@ -166,22 +205,28 @@ def attend():
 @filter_exception
 @filter_token
 def recommend(token):
-    content = request.args.get('content')
-    aid = request.args.get('aid')
-    pics = request.args.get('pics')
+    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
     pic_array = []
-    # for pic in pics.split('|'):
-    #     pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
-    #     if pic_path is None:
-    #         return result_fail('上传图片错误')
-    #     pic_array.append(pic_path)
-    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity_id=ObjectId(aid),
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
+            if pic_path is None:
+                return result_fail('上传图片错误')
+            pic_array.append(pic_path)
+
+    if is_friend == 'true':
+        is_friend = True
+    if is_city == 'true':
+        is_city = True
+
+    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
                             activity_state__active_type=1).first()
     if obj is not None:
         return result_fail('已经推荐过该活动')
     # 构建推荐对像
+    activity = Activity(id=aid)
     activity_state = ActivityState(active_type=1, object_id=ObjectId(), content=content, pics=pic_array,
-                                   activity_id=ObjectId(aid))
+                                   activity=activity, is_city=is_city, is_friend=is_friend)
     # 推荐到活动态
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
     # 添加活动添加数
@@ -219,17 +264,16 @@ def issue():
     ticket2 = ActivityTicket(name='普通票', inventory=20, description='5月20日 周杰伦盛大演出', price=200, is_entity=True)
     if type is None:
         creator_info = ActivityCreator(name='咕噜米', pic='1.jpg', id=1, creator_type=2)
-        Activity(title="年已经过完了", address=address, poster='img/1.png', hx_group_id='123456789',
+        Activity(title="z这是  03-05 的 活动", address=address, poster='img/1.png', hx_group_id='123456789',
                  labels=['旅游', '沙发'],
-                 begin_time=datetime.datetime.now() + datetime.timedelta(seconds=3600 * 24 * 2),
-                 end_time=datetime.datetime.now() + datetime.timedelta(
-                         seconds=360000),
+                 begin_time=datetime.datetime.now() + datetime.timedelta(4),
+                 end_time=datetime.datetime.now() + datetime.timedelta(5),
                  creator_info=creator_info, tickets=[ticket1, ticket2], is_free=True, cast_much='20').save()
     else:
         creator_info = ActivityCreator(name='咕噜米', pic='1.jpg', id=2, creator_type=1)
-        Activity(title="这是队列活动", address=address, pics=['1.jpg', '2.jpg'], hx_group_id='123456789',
+        Activity(title="这是  03-09 的 活动", address=address, pics=['1.jpg'], hx_group_id='123456789',
                  labels=['旅游', '沙发'], creator_info=creator_info, is_free=True,
-                 queue_begin_time=[datetime.datetime.now() + datetime.timedelta(seconds=3600 * 24 * 2)]).save()
+                 queue_begin_time=[datetime.datetime.now() + datetime.timedelta(8)]).save()
     return 'ok'
 
 

@@ -52,11 +52,16 @@ def request_required(*args_name):
 # (输入所有参数名)获取所有的参数值
 def request_all_values(*args_name):
     values = []
+    length = len(args_name)
     if request.method == 'GET':
         for name in args_name:
+            if length == 1:
+                return request.args.get(name)
             values.append(request.args.get(name))
     else:
         for name in args_name:
+            if length == 1:
+                return request.args.get(name)
             values.append(request.form.get(name))
     return values
 

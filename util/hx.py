@@ -57,12 +57,15 @@ class HxHelper:
             token = HxHelper.get_token()
             JSON_HEADER['Authorization'] = 'Bearer ' + token
             payload = {'username': username, 'password': password, 'nickname': nickname}
+            print(11111111111111111111111111111111111111111111111111)
             result = requests.post(HxHelper.__reqUrlFormat + 'users', json.dumps(payload), headers=JSON_HEADER)
+            print(22222222222222222222222222222222222222222222222222)
             if result.status_code == requests.codes.ok:
                 return True
             else:
                 return False
         except Exception as e:
+            print(44444444444444444444444444444444444444444444444)
             print(e)
             return False
 
