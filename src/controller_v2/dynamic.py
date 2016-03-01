@@ -160,5 +160,6 @@ def get_comment(token):
 @filter_token
 def dynamic_delete(token):
     dynamic_id = request_all_values('dynamic_id')
+
     MongoUser.objects(activity_state__object_id=ObjectId(dynamic_id)).update_one(pull__activity_state__object_id=ObjectId(dynamic_id))
     return result_success('删除成功')
