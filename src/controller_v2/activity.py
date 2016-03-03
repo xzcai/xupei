@@ -286,3 +286,19 @@ def activity_label(token):
     data = [{'label': '户外', 'num': 1}, {'label': '旅游', 'num': 1}, {'label': '聚会', 'num': 1}, {'label': '展览', 'num': 1},
             {'label': '骑行', 'num': 1}, {'label': '艺术', 'num': 1}]
     return result_success('成功', data)
+
+
+# 获取精选活动
+@app.route("/activity/select", methods=['get'])
+@filter_exception
+@filter_token
+def activity_select(token):
+    page_index = request_all_values('page_index')
+    data = [{'id': '123123', 'name': '户外', 'pic': '1.jpg'},
+            {'id': 'qweqw2', 'name': '阳光', 'pic': '1.jpg'},
+            {'id': 'sadsfdf', 'name': '时代发生的', 'pic': '1.jpg'},
+            {'id': 'dfgdfgdf', 'name': '时代发生的', 'pic': '1.jpg'},
+            {'id': '1231dfgdf23', 'name': '是的反弹', 'pic': '1.jpg'},
+            {'id': 'dfgddfg', 'name': '翻天怪', 'pic': '1.jpg'},
+            ]
+    return result_success('成功', data)

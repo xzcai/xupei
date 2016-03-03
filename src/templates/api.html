@@ -134,7 +134,7 @@
                         <li><a href="#activity_recommend">推荐活动</a></li>
                         <li><a href="#activity_attend">参加活动</a></li>
                         <li><a href="#activity_label">活动首页，获取标签及标签活动数</a></li>
-
+                        <li><a href="#activity_select">活动首页，获取精选活动</a></li>
                     </ul>
                 </li>
             </ul>
@@ -494,14 +494,6 @@
                                   "comments": {
                                     "num": 12                                                           <span>评论数</span>
                                     "content":                                                          <span>评论内容</span>
-    {#                                {#}
-    {#                                  "add_time": 1456647848,                                           <span>评论时间</span>#}
-    {#                                  "content": "content",                                             <span>评论内容</span>#}
-    {#                                  "id": "56d2af7a94a7c0405126c4e9",                                 <span>评论id</span>#}
-    {#                                  "my_name": "123",                                                 <span>评论人昵称</span>#}
-    {#                                  "my_pic": "/imgs/user/2183bcb4-d9da-11e5-811b-fcaa1499c97b.jpg",  <span>评论人头像</span>#}
-    {#                                  "obj_name": ""                                                    <span>被评论人昵称</span>#}
-    {#                                }#}
                                   },
                                   "content": "\u8fd9\u662f\u6211\u63a8\u8350\u7684\u6d3b\u52a8",        <span>活动态内容</span>
                                   "id": "56d2ac5494a7c058bd10ba41",                                     <span>活动态id</span>
@@ -528,6 +520,10 @@
                                     "num": 2                                                            <span>点赞数</span>
                                   },
                                   "type": 1                                                             <span>活动态类型 1=推荐 2=参加 3=发布 4=动态 </span>
+                                  "lat": "",                                                            <span>用户发布动态时的纬度 </span>
+                                  "log": "",                                                            <span>用户发布动态时的经度 </span>
+                                  "begin_time":""                                                       <span>用户发布活动时的  活动开始时间 </span>
+                                  "address":""                                                         <span>用户发布活动和活动的  地址</span>
                                 }
                               ],
                               "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
@@ -1271,6 +1267,71 @@
                                 {
                                   "label": "\u827a\u672f",
                                   "num": 1
+                                }
+                              ],
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_select">
+                        <header class="text-center"><h1>活动首页，获取标签及标签活动数</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/select</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [
+                                {
+                                  "id": "123123",                                    <span>活动id</span>
+                                  "name": "\u6237\u5916",                            <span>活动名字</span>
+                                  "pic": "1.jpg"                                     <span>图片</span>
+                                },
+                                {
+                                  "id": "qweqw2",
+                                  "name": "\u9633\u5149",
+                                  "pic": "1.jpg"
+                                },
+                                {
+                                  "id": "sadsfdf",
+                                  "name": "\u65f6\u4ee3\u53d1\u751f\u7684",
+                                  "pic": "1.jpg"
+                                },
+                                {
+                                  "id": "dfgdfgdf",
+                                  "name": "\u65f6\u4ee3\u53d1\u751f\u7684",
+                                  "pic": "1.jpg"
+                                },
+                                {
+                                  "id": "1231dfgdf23",
+                                  "name": "\u662f\u7684\u53cd\u5f39",
+                                  "pic": "1.jpg"
+                                },
+                                {
+                                  "id": "dfgddfg",
+                                  "name": "\u7ffb\u5929\u602a",
+                                  "pic": "1.jpg"
                                 }
                               ],
                               "msg": "\u6210\u529f",

@@ -76,8 +76,11 @@ def dynamic(token):
                                   'uid': dynamic.interrupt.user_id.mysql_id if dynamic.interrupt is not None else '',
                                   'name': dynamic.interrupt.user_id.info.nickname if dynamic.interrupt is not None else '',
                                   },
-                    'raise': get_raise(dynamic.raise_up, uid)
-                    # {'num': 2, 'is_raise': True, 'pics': ['1.jpg', '2.jpg']}
+                    'raise': get_raise(dynamic.raise_up, uid),
+                    'log': dynamic.longitude if dynamic.longitude is not None else '',
+                    'lat': dynamic.latitude if dynamic.latitude is not None else '',
+                    'address': dynamic.address if dynamic.address is not None else '',
+                    'begin_time': dynamic.begin_time if dynamic.begin_time is not None else ''
                 }
                 active_state.append(data)
 
@@ -156,7 +159,7 @@ def add_raise(token):
 
 
 # 添加评论
-@app.route("/dynamic/comment/post", methods=['get','POST'])
+@app.route("/dynamic/comment/post", methods=['get', 'POST'])
 @filter_exception
 @filter_token
 def add_comment(token):
