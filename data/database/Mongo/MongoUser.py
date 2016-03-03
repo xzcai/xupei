@@ -6,8 +6,6 @@ from data.database.Mongo.Activity import Activity
 from data.database.database import mongo
 import datetime
 
-from util.macro import active_state_type
-
 
 class Token(EmbeddedDocument):
     value = StringField(default='')
@@ -33,7 +31,7 @@ class Info(EmbeddedDocument):
 class Interrupt(EmbeddedDocument):
     add_time = mongo.DateTimeField(default=datetime.datetime.now())
     content = StringField()
-    user_id = IntField()
+    user_id = ReferenceField('MongoUser') #IntField()
 
 
 # class Posture(EmbeddedDocument):
@@ -44,7 +42,7 @@ class Interrupt(EmbeddedDocument):
 
 class ActivityState(EmbeddedDocument):
     object_id = ObjectIdField()
-    active_type = IntField(choices=active_state_type)
+    active_type = IntField(choices=((1, '推荐'), (2, '参加'), (3, '发布'), (4, '动态'), (5, '姿态')))
     interrupt = EmbeddedDocumentField(Interrupt)
     content = StringField()
     # posture = ListField(EmbeddedDocumentField(Posture))

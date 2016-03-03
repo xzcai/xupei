@@ -185,23 +185,9 @@ def test12():
 
 
 @app.route("/test3")
-@app.route("/user/login/pass", methods=['get', 'post'])
 @filter_exception
 def test3():
-    account, password, device_id = request_all_values('account', 'password', 'device_id')
-    user = UserInfo.query.filter_by(Account=account).first()
-    print(11111111111111111111111111111111111111111111111111111111111111111111,user.ID)
-    print(22222222222222222222222222222222222222222222222222222222222222222222,len(MongoUser.objects()))
-    if user is not None and BcryptPassManager.check_valid(password, user.Password):
-        mongo_user = MongoUser.objects(mysql_id=user.ID).first()
-        if mongo_user is None:
-            return result_fail('数据有误，请联系客服')
-        if mongo_user.info.is_verify and mongo_user.info.device_id != device_id:
-            return result_fail('您开启过设备保护，该设备不是常用设备')
-        else:
-            return make_token(user.ID)
-    else:
-        return result_fail('账号或密码错误')
+    return render_template('js.html')
 
 
 def test4():

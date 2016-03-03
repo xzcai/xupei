@@ -12,6 +12,7 @@
 
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script typet="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
     <title>API列表</title>
 
     <style>
@@ -40,1041 +41,1247 @@
         {
             color:blue;
         }
-        span
+        .interface span
         {
             color: red;
         }
+
+
+        li
+        {
+            list-style: none;
+            padding: 2px 2px 2px 2px;
+        }
+        .my_nav span
+        {
+            cursor: pointer;
+            font-weight: 900;
+
+        }
+        .title
+        {
+            font-size: 30px;
+            font-weight:900;
+            padding: 50px 10px;
+            color: red;
+        }
     </style>
+    <script type="text/javascript">
+        $(function(){
+            var span = $('.my_nav span')
+            span.click(function(){
+                var d =$(this).parent().next().css("display")
+                if(d=="block"){
+                    $(this).parent().next().css("display","none")
+                }else{
+                    $(this).parent().next().css("display","block")
+                }
+            })
+
+
+            $("body").dblclick(function(){
+                $("html,body").animate({scrollTop:0}, 200);
+            });
+        })
+    </script>
 </head>
 
 
 <body>
+
     <div class="container">
-        <table class="table table-hover table-bordered text-center">
-            <caption>接口导航</caption>
-            <tr>
-                <td>描述</td>
-                <td><a href="#user_register">用户注册</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#user_login_pass">用户登陆(通过密码)</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_sponsor">获取主办方活动</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_queue">获取队列活动</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_collect">活动收藏和取消收藏</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_recommend">推荐活动</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_attend">参加活动</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#activity_label">活动首页，获取标签及标签活动数</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#dynamic_num">获取活动态最新动态条数</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#dynamic_info">获取活动态最新动态信息</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#dynamic">获取活动态</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#user_activity">发布个人活动</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#user_dynamic">发布个人动态</a></td>
-            </tr>
-            <tr>
-                <td>描述</td>
-                <td><a href="#dynamic_raise">活动态点赞和取消点赞</a></td>
-            </tr>
-        </table>
-    <ul>
-        <li id="user_register">
-            <header class="text-center"><h1>用户注册</h1></header>
-            <div>
-                <h3>接口地址：/user/register</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数:空</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>account</td>
-                    <td>用户注册号（手机号码）</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td>用户密码</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>pic</td>
-                    <td>用户头像（转为base64格式）</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>nickname</td>
-                    <td>用户昵称</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>sex</td>
-                    <td>用户性别(0=男；1=女)</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>province</td>
-                    <td>所在省</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>city</td>
-                    <td>所在市</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>返回列表</caption>
-                <tr>
-                    <td>code</td>
-                    <td>http状态码，只有200表示结果正确</td>
-                </tr>
-                <tr>
-                    <td>data</td>
-                    <td>返回的导航数组列表</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-id</td>
-                    <td>导航id号</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-name</td>
-                    <td>导航显示名称</td>
-                </tr>
-                <tr>
-                    <td>msg</td>
-                    <td>服务器返回消息</td>
-                </tr>
-            </table>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                              "code": 200,
+        <div  style="margin-bottom: 30px"><span>说明：双击，回到顶部导航栏</span></div>
+        <div class="my_nav " style="margin: 0 auto">
+            <ul>
+                <li>
+                    <div>
+                        <span>用户相关接口</span>
+                    </div>
+                    <ul>
+                        <li><a href="#user_register">用户注册</a></li>
+                        <li><a href="#user_login_pass">用户登陆(通过密码)</a></li>
+                        <li><a href="#user_activity">发布个人活动</a></li>
+                        <li><a href="#user_dynamic">发布个人动态</a></li>
+
+                    </ul>
+                </li>
+
+                <li>
+                    <div>
+                        <span>活动态相关接口</span>
+                    </div>
+                    <ul style="display: none">
+                        <li><a href="#dynamic">获取活动态</a></li>
+                        <li><a href="#dynamic_num">最新动态条数</a></li>
+                        <li><a href="#dynamic_info">最新动态信息</a></li>
+                        <li><a href="#dynamic_delete">用户删除自己的活动态</a></li>
+                        <li><a href="#dynamic_interrupt">添加删除插话</a></li>
+                        <li><a href="#dynamic_raise">点赞和取消点赞</a></li>
+                        <li><a href="#dynamic_comment_add">添加评论</a></li>
+                        <li><a href="#dynamic_comment_delete">删除评论</a></li>
+                        <li><a href="#dynamic_comment_get">获取评论</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <div>
+                        <span>活动相关接口</span>
+                    </div>
+                    <ul style="display: none">
+                        <li><a href="#activity_sponsor">获取主办方活动</a></li>
+                        <li><a href="#activity_queue">获取队列活动</a></li>
+                        <li><a href="#activity_collect">活动收藏和取消收藏</a></li>
+                        <li><a href="#activity_recommend">推荐活动</a></li>
+                        <li><a href="#activity_attend">参加活动</a></li>
+                        <li><a href="#activity_label">活动首页，获取标签及标签活动数</a></li>
+
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <ul class="interface">
+
+            <li id="user">
+                <div>
+                    <header class="text-center title"><h1>用户相关接口</h1></header>
+                </div>
+                <ul>
+                    <li id="user_register">
+                        <header class="text-center"><h1>用户注册</h1></header>
+                        <div>
+                            <h3>接口地址：/user/register</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>account</td>
+                                <td>用户注册号（手机号码）</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>password</td>
+                                <td>用户密码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>pic</td>
+                                <td>用户头像（转为base64格式）</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>nickname</td>
+                                <td>用户昵称</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>sex</td>
+                                <td>用户性别(0=男；1=女)</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>province</td>
+                                <td>所在省</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>city</td>
+                                <td>所在市</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>返回列表</caption>
+                            <tr>
+                                <td>code</td>
+                                <td>http状态码，只有200表示结果正确</td>
+                            </tr>
+                            <tr>
+                                <td>data</td>
+                                <td>返回的导航数组列表</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;-id</td>
+                                <td>导航id号</td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;-name</td>
+                                <td>导航显示名称</td>
+                            </tr>
+                            <tr>
+                                <td>msg</td>
+                                <td>服务器返回消息</td>
+                            </tr>
+                        </table>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                                  "code": 200,
+                                  "data": [
+                                        {
+                                              "id": 101,
+                                              "name": "推荐"
+                                        },
+                                        {
+                                              "id": 102,
+                                              "name": "母婴"
+                                        },
+                                        {
+                                              "id": 103,
+                                              "name": "数码"
+                                        },
+                                        {
+                                              "id": 106,
+                                              "name": "test"
+                                        }
+                                  ],
+                                  "msg": "ok"
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_login_pass">
+                        <header class="text-center"><h1>用户登陆（通过密码）</h1></header>
+                        <div>
+                            <h3>接口地址：/user/login/pass</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>account</td>
+                                <td>用户注册号（手机号码）</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>password</td>
+                                <td>用户密码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>device_id</td>
+                                <td>设备唯一id</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_activity">
+                        <header class="text-center"><h1>发布个人活动</h1></header>
+                        <div>
+                            <h3>接口地址：/user/activity</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>content</th>
+                                <th>内容</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>address</td>
+                                <td>活动地址</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>begin_time</th>
+                                <th>活动开始时间</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>pics</td>
+                                <td>图片</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <th>is_friend</th>
+                                <th>是否好友可见</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>is_city</td>
+                                <td>是否城市可见</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_dynamic">
+                        <header class="text-center"><h1>发布个人动态</h1></header>
+                        <div>
+                            <h3>接口地址：/user/dynamic</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>content</th>
+                                <th>内容</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>pics</td>
+                                <td>图片</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>address</td>
+                                <td>地址</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <th>log</th>
+                                <th>经度（传了地址就一定要传经纬度）</th>
+                                <th>否</th>
+                            </tr>
+                            <tr>
+                                <td>lat</td>
+                                <td>纬度</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <th>is_friend</th>
+                                <th>是否好友可见</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>is_city</td>
+                                <td>是否城市可见</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <li id="dynamic">
+                <div>
+                    <header class="text-center title"><h1>活动态相关接口</h1></header>
+                </div>
+                <ul>
+                    <li id="dynamic">
+                        <header class="text-center"><h1>获取活动态最新动态信息</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>page_index</td>
+                                <td>页码</td>
+                                <td>否 默认=1</td>
+                            </tr>
+                            <tr>
+                                <td>page_size</td>
+                                <td>页面发小</td>
+                                <td>否 默认=10</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
                               "data": [
-                                    {
-                                          "id": 101,
-                                          "name": "推荐"
-                                    },
-                                    {
-                                          "id": 102,
-                                          "name": "母婴"
-                                    },
-                                    {
-                                          "id": 103,
-                                          "name": "数码"
-                                    },
-                                    {
-                                          "id": 106,
-                                          "name": "test"
+                                {
+                                  "activity": {                                                         <span>点赞和参加 活动的id和标题</span>
+                                    "id": "56b05c9e94a7c0ab54582b3d",
+                                    "title": "hui jia guo nian"
+                                    "address":""
+                                  },
+                                  "add_time": 1456647251,                                               <span>活动态添加时间</span>
+                                  "comments": {
+                                    "num": 12                                                           <span>评论数</span>
+                                    "content":                                                          <span>评论内容</span>
+    {#                                {#}
+    {#                                  "add_time": 1456647848,                                           <span>评论时间</span>#}
+    {#                                  "content": "content",                                             <span>评论内容</span>#}
+    {#                                  "id": "56d2af7a94a7c0405126c4e9",                                 <span>评论id</span>#}
+    {#                                  "my_name": "123",                                                 <span>评论人昵称</span>#}
+    {#                                  "my_pic": "/imgs/user/2183bcb4-d9da-11e5-811b-fcaa1499c97b.jpg",  <span>评论人头像</span>#}
+    {#                                  "obj_name": ""                                                    <span>被评论人昵称</span>#}
+    {#                                }#}
+                                  },
+                                  "content": "\u8fd9\u662f\u6211\u63a8\u8350\u7684\u6d3b\u52a8",        <span>活动态内容</span>
+                                  "id": "56d2ac5494a7c058bd10ba41",                                     <span>活动态id</span>
+                                  "interrupt": {
+                                    "add_time": 1456652923,                                             <span>插话时间</span>
+                                    "content": "\u6211\u7684\u63d2\u8bdd",                              <span>插话内容</span>
+                                    "uid": 229                                                          <span>插话人id</span>
+                                    "name":"zxc"
+                                  },
+                                  "user_info":{
+                                     "id":239,                                                          <span>活动态所属人id</span>
+                                     "name":'cxz',                                                      <span>活动态所属人昵称</span>
+                                     "pic":""                                                           <span>活动态所属人头像</span>
                                     }
+                                  "name": "123",
+                                  "pic": "/imgs/user/2183bcb4-d9da-11e5-811b-fcaa1499c97b.jpg",
+                                  "pics": [],
+                                  "raise": {
+                                    "data": [                                                           <span>点赞头像</span>
+                                          "1.jpg",
+                                          "2.jpg"
+                                        ],
+                                    "is_raise": true,                                                   <span>当前用户是否点赞</span>
+                                    "num": 2                                                            <span>点赞数</span>
+                                  },
+                                  "type": 1                                                             <span>活动态类型 1=推荐 2=参加 3=发布 4=动态 </span>
+                                }
                               ],
-                              "msg": "ok"
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="user_login_pass">
-            <header class="text-center"><h1>用户登陆（通过密码）</h1></header>
-            <div>
-                <h3>接口地址：/user/login/pass</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数:空</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>account</td>
-                    <td>用户注册号（手机号码）</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td>用户密码</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>device_id</td>
-                    <td>设备唯一id</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": {
-                            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
-                            "user_info": {
-                              "city": "leping",
-                              "device_id": "",
-                              "hx_account": "15757048961",
-                              "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
-                              "is_protect": false,
-                              "is_verify": false,
-                              "nickname": "12zxdczx3",
-                              "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
-                              "province": "jiangxi",
-                              "sex": true,
-                              "signature": "",
-                              "user_origin": 1
+                              "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
+                              "status": true
                             }
-                          },
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_sponsor">
-            <header class="text-center"><h1>主办方活动</h1></header>
-            <div>
-                <h3>接口地址：/activity/sponsor</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>label</td>
-                    <td>标签名</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>attribute</td>
-                    <td>属性(1=最新；2=热门；3=推荐；4=免费；5=附近；6=精选)</td>
-                    <td>否，没有该属性时，代表是活动首页</td>
-                </tr>
-                <tr>
-                    <td>date</td>
-                    <td>日期(转为时间戳)</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>city_id</td>
-                    <td>城市id</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>page_size</td>
-                    <td>页面大小</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>page_index</td>
-                    <td>页码</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>longitude</td>
-                    <td>经度（当属性为附近时，必填）</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>latitude</td>
-                    <td>纬度（当属性为附近时，必填）</td>
-                    <td>否</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_num">
+                        <header class="text-center"><h1>获取活动态最新动态条数</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/new/num</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "address": "zhong yue",   //活动地址
-                              "attend_count": 0,        //活动参加人数
-                              "begin_time": 1454571510, //活动开始时间
-                              "cast_much": "",          //活动消费
-                              "name": "",               //主办方名字
-                              "pic": "1.jpg"            //主办方头像
-                              "id": "56b05cf794a7c0a790bec7da",   //活动id
-                              "is_collection": false,             //是否收藏  true=已经收藏   false=未收藏
-                              "labels": [                         //活动标签
-                                "\u65c5\u6e38",
-                                "\u6c99\u53d1"
+                              "data": 12,             <span style="color: red">//条数</span>
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_info">
+                        <header class="text-center"><h1>获取活动态最新动态信息</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/new/info</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [
+                                {
+                                  "add_time": 12312312,     <span>添加时间</span>
+                                  "id": 1,                  <span>用户id</span>
+                                  "name": "xzca",           <span>用户名字</span>
+                                  "pic": "1.jpg",           <span>用户头像</span>
+                                  "type": 1                 <span>1=插话；2=点赞；3=参加；4=评论</span>
+                                }
                               ],
-                              "poster": "img/1.png",             //活动海报
-                              "recommend_count": 0,              //活动推荐人数
-                              "title": "qu da pai"               //活动标题
+                              "msg": "\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_queue">
-            <header class="text-center"><h1>队列活动</h1></header>
-            <div>
-                <h3>接口地址：/activity/queue</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>label</td>
-                    <td>标签名</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>attribute</td>
-                    <td>属性(1=最新；2=热门；3=推荐；4=免费；5=附近；6=精选)</td>
-                    <td>否，没有该属性时，代表是活动首页</td>
-                </tr>
-                <tr>
-                    <td>date</td>
-                    <td>日期(转为时间戳)</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>city_id</td>
-                    <td>城市id</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>page_size</td>
-                    <td>页面大小（默认30）</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>page_index（默认1）</td>
-                    <td>页码</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>longitude</td>
-                    <td>经度（当属性为附近时，必填）</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>latitude</td>
-                    <td>纬度（当属性为附近时，必填）</td>
-                    <td>否</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_raise">
+                        <header class="text-center"><h1>活动态点赞和取消点赞</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/raise</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>dynamic_id</th>
+                                <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <th>uid</th>
+                                <th>该活动态所属人uid</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <td>op</td>
+                                <td>操作类型（add=点赞；concel=取消点赞）</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_delete">
+                        <header class="text-center"><h1>用户删除自己的活动态</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/delete</h3>
+                            <h4 >请求方式：<i class="red">DELETE</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>dynamic_id</th>
+                                <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_interrupt">
+                        <header class="text-center"><h1>添加删除插话</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/interrupt</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>dynamic_id</th>
+                                <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <th>content</th>
+                                <th>插话内容</th>
+                                <th>是（添加插话时必填）</th>
+                            </tr>
+                            <tr>
+                                <th>op</th>
+                                <th>op=add：添加插话      op=cancel：取消插话</th>
+                                <th>是</th>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_comment_add">
+                        <header class="text-center"><h1>添加评论</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/comment</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>dynamic_id</th>
+                                <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <th>content</th>
+                                <th>插话内容</th>
+                                <th>是（添加插话时必填）</th>
+                            </tr>
+                            <tr>
+                                <th>obj_uid</th>
+                                <th>如果obj_uid=0，说明是对活动态评论；如果是回复评论,传对方uid</th>
+                                <th>是</th>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_comment_delete">
+                        <header class="text-center"><h1>删除评论</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/comment</h3>
+                            <h4 >请求方式：<i class="red">DELETE</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>comment_id</th>
+                                <th>评论id</th>
+                                <th>是</th>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="dynamic_comment_get">
+                        <header class="text-center"><h1>获取评论</h1></header>
+                        <div>
+                            <h3>接口地址：/dynamic/comment</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <th>dynamic_id</th>
+                                <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "address": "zhong yue",
-                              "attend_count": 0,
-                              "begin_time": [
-                                1456280818,
-                                1456453618
+                              "data": [
+                                {
+                                  "add_time": 1456945369,                       <span>添加时间</span>
+                                  "content": "bbb",                             <span>评论内容</span>
+                                  "obj_nickname": "",                           <span></span>
+                                  "obj_uid": 0,                                 <span>如果为0；是对活动态评论</span>
+                                  "ori_nickname": "12zxdczx3",                  <span>评论者姓名</span>
+                                  "ori_pic": "/static/img",                     <span>评论者头像</span>
+                                  "ori_uid": 239                                <span>评论者id</span>
+                                },
+                                {
+                                  "add_time": 1456945369,
+                                  "content": "aaa",
+                                  "obj_nickname": "",
+                                  "obj_uid": 0,
+                                  "ori_nickname": "12zxdczx3",
+                                  "ori_pic": "/static/imgs/user/c091b858-df5b-11e5-8275-fcaa1499c97b.jpg",
+                                  "ori_uid": 239
+                                }
                               ],
-                              "creator_name": "\u5495\u565c\u7c73",
-                              "creator_pic": "1.jpg",
-                              "id": "56cd14f294a7c05f2cef0c6f",
-                              "is_collection": false,
-                              "is_free": true,
-                              "labels": [
-                                "\u65c5\u6e38",
-                                "\u6c99\u53d1"
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+
+            <li id="activity">
+                <div>
+                    <header class="text-center title"><h1>活动相关接口</h1></header>
+                </div>
+                <ul>
+                    <li id="activity_sponsor">
+                        <header class="text-center"><h1>主办方活动</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/sponsor</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>label</td>
+                                <td>标签名</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>attribute</td>
+                                <td>属性(1=最新；2=热门；3=推荐；4=免费；5=附近；6=精选)</td>
+                                <td>否，没有该属性时，代表是活动首页</td>
+                            </tr>
+                            <tr>
+                                <td>date</td>
+                                <td>日期(转为时间戳)</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>city_id</td>
+                                <td>城市id</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>page_size</td>
+                                <td>页面大小</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>page_index</td>
+                                <td>页码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>longitude</td>
+                                <td>经度（当属性为附近时，必填）</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>latitude</td>
+                                <td>纬度（当属性为附近时，必填）</td>
+                                <td>否</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [
+                                {
+                                  "address": "zhong yue",   //活动地址
+                                  "attend_count": 0,        //活动参加人数
+                                  "begin_time": 1454571510, //活动开始时间
+                                  "cast_much": "",          //活动消费
+                                  "name": "",               //主办方名字
+                                  "pic": "1.jpg"            //主办方头像
+                                  "id": "56b05cf794a7c0a790bec7da",   //活动id
+                                  "is_collection": false,             //是否收藏  true=已经收藏   false=未收藏
+                                  "labels": [                         //活动标签
+                                    "\u65c5\u6e38",
+                                    "\u6c99\u53d1"
+                                  ],
+                                  "poster": "img/1.png",             //活动海报
+                                  "recommend_count": 0,              //活动推荐人数
+                                  "title": "qu da pai"               //活动标题
+                                }
                               ],
-                              "pics": [
-                                "1.jpg",
-                                "2.jpg"
+                              "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_queue">
+                        <header class="text-center"><h1>队列活动</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/queue</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>label</td>
+                                <td>标签名</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>attribute</td>
+                                <td>属性(1=最新；2=热门；3=推荐；4=免费；5=附近；6=精选)</td>
+                                <td>否，没有该属性时，代表是活动首页</td>
+                            </tr>
+                            <tr>
+                                <td>date</td>
+                                <td>日期(转为时间戳)</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>city_id</td>
+                                <td>城市id</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>page_size</td>
+                                <td>页面大小（默认30）</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>page_index（默认1）</td>
+                                <td>页码</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>longitude</td>
+                                <td>经度（当属性为附近时，必填）</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>latitude</td>
+                                <td>纬度（当属性为附近时，必填）</td>
+                                <td>否</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [
+                                {
+                                  "address": "zhong yue",
+                                  "attend_count": 0,
+                                  "begin_time": [
+                                    1456280818,
+                                    1456453618
+                                  ],
+                                  "creator_name": "\u5495\u565c\u7c73",
+                                  "creator_pic": "1.jpg",
+                                  "id": "56cd14f294a7c05f2cef0c6f",
+                                  "is_collection": false,
+                                  "is_free": true,
+                                  "labels": [
+                                    "\u65c5\u6e38",
+                                    "\u6c99\u53d1"
+                                  ],
+                                  "pics": [
+                                    "1.jpg",
+                                    "2.jpg"
+                                  ],
+                                  "recommend_count": 0,
+                                  "title": "\u5e74\u5df2\u7ecf\u8fc7\u5b8c\u4e86"
+                                }
                               ],
-                              "recommend_count": 0,
-                              "title": "\u5e74\u5df2\u7ecf\u8fc7\u5b8c\u4e86"
+                              "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_collect">
-            <header class="text-center"><h1>活动收藏(如果是收藏状态，请求者取消收藏；反之....)</h1></header>
-            <div>
-                <h3>接口地址：/activity/collect</h3>
-                <h4 >请求方式：<i class="red">PUT</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>aid</td>
-                    <td>活动id</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [],
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_recommend">
-            <header class="text-center"><h1>活动推荐</h1></header>
-            <div>
-                <h3>接口地址：/activity/recommend</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>aid</td>
-                    <td>活动id</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>content</td>
-                    <td>内容</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>pics</td>
-                    <td>图片(转成base64，按(img1|img2)格式)</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>is_city</td>
-                    <td>是否城市可见：是=true；fou=false</td>
-                    <td>（和is_friend必填一）</td>
-                </tr>
-                <tr>
-                    <td>is_friend</td>
-                    <td>是否好友可见：是=true；fou=false</td>
-                    <td>（和is_city必填一）</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [],
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_attend">
-            <header class="text-center"><h1>活动参加</h1></header>
-            <div>
-                <h3>接口地址：/activity/attend</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>aid</td>
-                    <td>活动id</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <td>content</td>
-                    <td>内容</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>pics</td>
-                    <td>图片(转成base64，按(img1|img2)格式)</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>is_city</td>
-                    <td>是否城市可见：是=true；fou=false</td>
-                    <td>（和is_friend必填一）</td>
-                </tr>
-                <tr>
-                    <td>is_friend</td>
-                    <td>是否好友可见：是=true；fou=false</td>
-                    <td>（和is_city必填一）</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [],
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="activity_label">
-            <header class="text-center"><h1>活动首页，获取标签及标签活动数</h1></header>
-            <div>
-                <h3>接口地址：/activity/label</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_collect">
+                        <header class="text-center"><h1>活动收藏(如果是收藏状态，请求者取消收藏；反之....)</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/collect</h3>
+                            <h4 >请求方式：<i class="red">PUT</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>aid</td>
+                                <td>活动id</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "label": "\u6237\u5916",      <span>标签名</span>
-                              "num": 1                      <span>标签活动数</span>
-                            },
-                            {
-                              "label": "\u65c5\u6e38",
-                              "num": 1
-                            },
-                            {
-                              "label": "\u805a\u4f1a",
-                              "num": 1
-                            },
-                            {
-                              "label": "\u5c55\u89c8",
-                              "num": 1
-                            },
-                            {
-                              "label": "\u9a91\u884c",
-                              "num": 1
-                            },
-                            {
-                              "label": "\u827a\u672f",
-                              "num": 1
+                              "data": [],
+                              "msg": "\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="dynamic_num">
-            <header class="text-center"><h1>获取活动态最新动态条数</h1></header>
-            <div>
-                <h3>接口地址：/dynamic/new/num</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": 12,             <span style="color: red">//条数</span>
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="dynamic_info">
-            <header class="text-center"><h1>获取活动态最新动态信息</h1></header>
-            <div>
-                <h3>接口地址：/dynamic/new/info</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_recommend">
+                        <header class="text-center"><h1>活动推荐</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/recommend</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>aid</td>
+                                <td>活动id</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>content</td>
+                                <td>内容</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>pics</td>
+                                <td>图片(转成base64，按(img1|img2)格式)</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>is_city</td>
+                                <td>是否城市可见：是=true；fou=false</td>
+                                <td>（和is_friend必填一）</td>
+                            </tr>
+                            <tr>
+                                <td>is_friend</td>
+                                <td>是否好友可见：是=true；fou=false</td>
+                                <td>（和is_city必填一）</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "add_time": 12312312,     <span>添加时间</span>
-                              "id": 1,                  <span>用户id</span>
-                              "name": "xzca",           <span>用户名字</span>
-                              "pic": "1.jpg",           <span>用户头像</span>
-                              "type": 1                 <span>1=插话；2=点赞；3=参加；4=评论</span>
+                              "data": [],
+                              "msg": "\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="dynamic">
-            <header class="text-center"><h1>获取活动态最新动态信息</h1></header>
-            <div>
-                <h3>接口地址：/dynamic</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_attend">
+                        <header class="text-center"><h1>活动参加</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/attend</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>aid</td>
+                                <td>活动id</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>content</td>
+                                <td>内容</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>pics</td>
+                                <td>图片(转成base64，按(img1|img2)格式)</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td>is_city</td>
+                                <td>是否城市可见：是=true；fou=false</td>
+                                <td>（和is_friend必填一）</td>
+                            </tr>
+                            <tr>
+                                <td>is_friend</td>
+                                <td>是否好友可见：是=true；fou=false</td>
+                                <td>（和is_city必填一）</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "activity": {                                                         <span>点赞和参加 活动的id和标题</span>
-                                "id": "56b05c9e94a7c0ab54582b3d",
-                                "title": "hui jia guo nian"
-                              },
-                              "add_time": 1456647251,                                               <span>活动态添加时间</span>
-                              "comments": {
-                                "num": 12                                                           <span>评论数</span>
-                                "content":                                                          <span>评论内容</span>
-{#                                {#}
-{#                                  "add_time": 1456647848,                                           <span>评论时间</span>#}
-{#                                  "content": "content",                                             <span>评论内容</span>#}
-{#                                  "id": "56d2af7a94a7c0405126c4e9",                                 <span>评论id</span>#}
-{#                                  "my_name": "123",                                                 <span>评论人昵称</span>#}
-{#                                  "my_pic": "/imgs/user/2183bcb4-d9da-11e5-811b-fcaa1499c97b.jpg",  <span>评论人头像</span>#}
-{#                                  "obj_name": ""                                                    <span>被评论人昵称</span>#}
-{#                                }#}
-                              },
-                              "content": "\u8fd9\u662f\u6211\u63a8\u8350\u7684\u6d3b\u52a8",        <span>活动态内容</span>
-                              "id": "56d2ac5494a7c058bd10ba41",                                     <span>活动态id</span>
-                              "interrupt": {
-                                "add_time": 1456652923,                                             <span>插话时间</span>
-                                "content": "\u6211\u7684\u63d2\u8bdd",                              <span>插话内容</span>
-                                "uid": 229                                                          <span>插话人id</span>
-                              },
-                              "name": "123",                                                        <span>活动态所属人昵称</span>
-                              "pic": "/imgs/user/2183bcb4-d9da-11e5-811b-fcaa1499c97b.jpg",         <span>活动态所属人头像</span>
-                              "pics": [],
-                              "raise": {
-                                "data": [                                                           <span>点赞头像</span>
-                                      "1.jpg",
-                                      "2.jpg"
-                                    ],
-                                "is_raise": true,                                                   <span>当前用户是否点赞</span>
-                                "num": 2                                                            <span>点赞数</span>
-                              },
-                              "type": 1                                                             <span>活动态类型 1=推荐 2=参加 3=发布 4=动态 </span>
+                              "data": [],
+                              "msg": "\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "\u83b7\u53d6\u6570\u636e\u6210\u529f",
-                          "status": true
-                        }
-                    </pre>
-            </div>
-        </li>
-        <li id="user_activity">
-            <header class="text-center"><h1>发布个人活动</h1></header>
-            <div>
-                <h3>接口地址：/user/activity</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <th>content</th>
-                    <th>内容</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>address</td>
-                    <td>活动地址</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <th>begin_time</th>
-                    <th>活动开始时间</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>pics</td>
-                    <td>图片</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <th>is_friend</th>
-                    <th>是否好友可见</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>is_city</td>
-                    <td>是否城市可见</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-
-                    </pre>
-            </div>
-        </li>
-        <li id="user_dynamic">
-            <header class="text-center"><h1>发布个人动态</h1></header>
-            <div>
-                <h3>接口地址：/user/dynamic</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <th>content</th>
-                    <th>内容</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>pics</td>
-                    <td>图片</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <td>address</td>
-                    <td>地址</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <th>log</th>
-                    <th>经度（传了地址就一定要传经纬度）</th>
-                    <th>否</th>
-                </tr>
-                <tr>
-                    <td>lat</td>
-                    <td>纬度</td>
-                    <td>否</td>
-                </tr>
-                <tr>
-                    <th>is_friend</th>
-                    <th>是否好友可见</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>is_city</td>
-                    <td>是否城市可见</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-
-                    </pre>
-            </div>
-        </li>
-        <li id="dynamic_raise">
-            <header class="text-center"><h1>活动态点赞和取消点赞</h1></header>
-            <div>
-                <h3>接口地址：/dynamic/raise</h3>
-                <h4 >请求方式：<i class="red">POST</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>请求参数</caption>
-                <tr>
-                    <th>参数名</th>
-                    <th>说明</th>
-                    <th>是否必填</th>
-                </tr>
-                <tr>
-                    <td>token</td>
-                    <td>唯一token</td>
-                    <td>是</td>
-                </tr>
-                <tr>
-                    <th>dynamic_id</th>
-                    <th>活动态id</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <th>uid</th>
-                    <th>改活动态所属人uid</th>
-                    <th>是</th>
-                </tr>
-                <tr>
-                    <td>op</td>
-                    <td>操作类型（add=点赞；concel=取消点赞）</td>
-                    <td>是</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-
-                    </pre>
-            </div>
-        </li>
-        <li>
-            <header class="text-center"><h1>获取某一导航下条目列表</h1></header>
-            <div>
-                <h3>接口地址：/v1.0/Channel/&lt;int:<i class="blue">channelId</i>&gt;/Item</h3>
-                <h4 >请求方式：<i class="red">GET</i></h4>
-            </div>
-            <table class="table v">
-                <caption>请求参数:</caption>
-                <tr>
-                    <td>offset</td>
-                    <td>请求的数据偏移量（为空则默认为0）</td>
-                </tr>
-                <tr>
-                    <td>page_size</td>
-                    <td>请求的数据页面大小（为空则默认为20）</td>
-                </tr>
-            </table>
-            <hr >
-            <div>
-                <h4 >返回格式：<i class="red">JSON</i></h4>
-            </div>
-            <table class="table table-hover table-bordered">
-                <caption>返回列表</caption>
-                <tr>
-                    <td>code</td>
-                    <td>http状态码，只有200表示结果正确</td>
-                </tr>
-                <tr>
-                    <td>data</td>
-                    <td>返回的类目数组列表</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-id</td>
-                    <td>类目id号</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-title</td>
-                    <td>类目标题</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-cover_image_url</td>
-                    <td>类目封面显示图片地址</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-publish_time</td>
-                    <td>类目发布时间（timestamp）</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;-type</td>
-                    <td>类目种类（根据不同的种类，在客户端的点击显示格式也不一样，目前只有post）</td>
-                </tr>
-                <tr>
-                    <td>msg</td>
-                    <td>服务器返回消息</td>
-                </tr>
-            </table>
-            <div>
-                <h4>返回示例</h4>
-                    <pre>
-                        {
-                          "code": 200,
-                          "data": [
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_label">
+                        <header class="text-center"><h1>活动首页，获取标签及标签活动数</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/label</h3>
+                            <h4 >请求方式：<i class="red">GET</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
                             {
-                              "cover_image_url": "http://img_url.jpg",
-                              "id": 2,
-                              "publish_time": 1443575543.0,
-                              "title": "标题1",
-                              "type": "post"
-                            },
-                            {
-                              "cover_image_url": "http://img_url.jpg",
-                              "id": 3,
-                              "publish_time": 1443575543.0,
-                              "title": "标题2",
-                              "type": "post"
+                              "data": [
+                                {
+                                  "label": "\u6237\u5916",      <span>标签名</span>
+                                  "num": 1                      <span>标签活动数</span>
+                                },
+                                {
+                                  "label": "\u65c5\u6e38",
+                                  "num": 1
+                                },
+                                {
+                                  "label": "\u805a\u4f1a",
+                                  "num": 1
+                                },
+                                {
+                                  "label": "\u5c55\u89c8",
+                                  "num": 1
+                                },
+                                {
+                                  "label": "\u9a91\u884c",
+                                  "num": 1
+                                },
+                                {
+                                  "label": "\u827a\u672f",
+                                  "num": 1
+                                }
+                              ],
+                              "msg": "\u6210\u529f",
+                              "status": true
                             }
-                          ],
-                          "msg": "ok"
-                        }
-                    </pre>
-            </div>
-        </li>
-    </ul>
-
-
-
-</div>
+                        </pre>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>

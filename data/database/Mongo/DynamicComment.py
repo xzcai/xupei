@@ -16,7 +16,7 @@ class DynamicComment(Document):
     meta = {
         'collection': 'dynamic_comment',
         'indexes': [
-            'dynamic_id'
+            'dynamic_id',
         ]
     }
 
