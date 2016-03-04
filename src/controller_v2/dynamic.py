@@ -69,7 +69,7 @@ def dynamic(token):
                     'pics': dynamic.pics,
                     'add_time': time_to_stamp(dynamic.add_time),
                     'type': dynamic.active_type,
-                    'comments': {'num': 12, 'content': ''},
+                    'comments': {'num': 12, 'content': '我的评论，这是假数据'},
                     'interrupt': {'content': dynamic.interrupt.content if dynamic.interrupt is not None else '',
                                   'add_time': time_to_stamp(
                                           dynamic.interrupt.add_time) if dynamic.interrupt is not None else '',

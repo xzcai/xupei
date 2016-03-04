@@ -20,6 +20,7 @@ class HxHelper:
     __clientSecret = 'YXA6bggrqeXUr0TArQFjsK28u2SgnnQ'
     __appName = "test"
     __orgName = "benhu-hx"
+    # __reqUrlFormat = "https://182.92.159.193/" + __orgName + "/" + __appName + "/"
     __reqUrlFormat = "https://a1.easemob.com/" + __orgName + "/" + __appName + "/"
     __get_token_request_body = {'grant_type': 'client_credentials', 'client_id': __clientID,
                                 'client_secret': __clientSecret}

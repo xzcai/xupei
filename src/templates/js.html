@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script type="text/javascript">
-        alert(screen.availHeight)
+       function validateIt(inputelement){
+           if(inputelement.validity.patternMismatch){
+               inputelement.setCustomValidity('只许输入字母');
+           }else {
+               inputelement.setCustomValidity('f')
+           }
+           return true
+       }
     </script>
 </head>
 <body>
-
+<form action="">
+    <input type="text" pattern="[a-z]" oninvalid="validateIt(this)" onchange="validateIt(this)" oninput="validateIt(this)">
+    <input type="submit">
+</form>
 </body>
 </html>
