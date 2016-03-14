@@ -85,42 +85,38 @@ def user_login_pass():
 
 
 # 03通过验证码登陆
-@app.route("/user/login_code", methods=['get'])
+@app.route("/user/login/code", methods=['get', 'post'])
 @filter_exception
 def user_login_code():
-    phone = request.args.get("phone")
-    code = request.args.get("code")
+    phone, code = request_all_values('phone', 'code')
     status, msg = verify_bll(phone, code, 2)
-    if status is False:
-        return result(msg, status)
+    if status:
+        return result_fail(msg)
     user = UserInfo.query.filter_by(Account=phone).first()
     return make_token(user.ID)
 
 
 # 04修改注册账号
-@app.route("/user/account", methods=['get'])
+@app.route("/user/account", methods=['get', 'put'])
 @filter_exception
 @filter_token
 def modify_account(token):
     uid = token['id']
-    phone = request.args.get('phone')
-    code = request.args.get('code')
+    phone, code = request_all_values('phone', 'code')
     status, msg = verify_bll(phone, code, 6)
-    if status is False:
-        return result(msg, status)
-    obj = UserInfo.query.filter_by(ID=uid).update({UserInfo.Account: phone})
+    if status:
+        return result_fail(msg)
+    UserInfo.query.filter_by(ID=uid).update({UserInfo.Account: phone})
     mysql.session.commit()
     return make_token(uid)
 
 
 # 05通过原始密码修改密码
-@app.route("/user/password_pass", methods=['get'])
+@app.route("/user/password/pass", methods=['get' 'put'])
 @filter_exception
 @filter_token
 def modify_pass_by_pass(token):
-    origin_pass = request.args.get("origin_pass")
-    new_pass = request.args.get("new_pass")
-
+    origin_pass, new_pass = request_all_values('origin_pass', 'new_pass')
     uid = token['id']
     user = UserInfo.query.filter_by(ID=uid).first()
     # user = MongoUser.objects(mysql_id=uid).first()
@@ -131,23 +127,22 @@ def modify_pass_by_pass(token):
 
 
 # 06通过验证码修改密码
-@app.route("/user/password_code", methods=['get'])
+@app.route("/user/password/code", methods=['get','put'])
 @filter_exception
 @filter_token
 def modify_pass_by_code(token):
-    new_pass = request.args.get("new_pass")
+    new_pass = request_all_values('new_pass')
     uid = token['id']
     return modify_password(uid, BcryptPassManager.encrypt_pass(new_pass))
 
 
 # 07设置账户保护
-@app.route('/user/protect', methods=['get'])
+@app.route('/user/protect', methods=['get', 'put'])
 @filter_exception
 @filter_token
 def set_protect(token):
     uid = token['id']
-    type = request.args.get("type")
-    device_id = request.args.get("device_id")
+    type, device_id = request_all_values('type', 'device_id')
     if type == "1":
         type = True
     else:
@@ -195,7 +190,7 @@ def set_info(token):
 
 
 # 09设置许陪号
-@app.route('/user/xp_account', methods=['get'])
+@app.route('/user/xp_account', methods=['get','put'])
 @filter_exception
 @filter_token
 def set_xp_account(token):

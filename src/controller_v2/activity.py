@@ -1,9 +1,11 @@
 import datetime
+import json
+import random
 
 from bson import ObjectId
 from flask import request
 from mongoengine import Q
-from data.database.Mongo.Activity import Activity, Address, ActivityCreator, ActivityTicket
+from data.database.Mongo.Activity import Activity, Address, ActivityCreator, ActivityTicket, TicketInfo
 from data.database.Mongo.MongoUser import MongoUser, ActivityState
 from src import app
 from src.bll.activity_bll import is_collection
@@ -20,15 +22,15 @@ from util.token_helper import filter_token
 # 活动属性排序
 def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, latitude=None):
     if sort_attribute == Activity_Attribute.hot:
-        objs = Activity.objects(where).order_by('-statistics.attend_count').exclude('tickets')
+        objs = Activity.objects(where).order_by('-statistics.attend_count')
     elif sort_attribute == Activity_Attribute.recommend:
-        objs = Activity.objects(where).order_by('-statistics.recommend_count').exclude('tickets')
+        objs = Activity.objects(where).order_by('-statistics.recommend_count')
     elif sort_attribute == Activity_Attribute.free:
         where = where & Q(is_free=True)
-        objs = Activity.objects(where).order_by('create_time').exclude('tickets')
+        objs = Activity.objects(where).order_by('create_time')
     elif sort_attribute == Activity_Attribute.near:
         print(longitude, latitude)
-        objs = Activity.objects(where).exclude('tickets')
+        objs = Activity.objects(where)
         data = []
         for o in objs:
             o.distance = calc_distance(float(latitude), float(longitude), float(o.address.latitude),
@@ -38,9 +40,9 @@ def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, 
         return sorted(data, key=lambda x: x['distance'])
 
     elif sort_attribute == Activity_Attribute.select:
-        objs = Activity.objects(where).order_by('create_time').exclude('tickets')
+        objs = Activity.objects(where).order_by('create_time')
     else:
-        objs = Activity.objects(where).order_by('create_time').exclude('tickets')
+        objs = Activity.objects(where).order_by('create_time')
 
     size = int(page_size)
     num = (int(page_index) - 1) * size
@@ -106,7 +108,7 @@ def activity_sponsor(token):
     # 首页
     else:
         objs = Activity.objects(where).order_by('-statistics.attend_count').order_by(
-                '-statistics.recommend_count').exclude('tickets').skip(0).limit(30)
+                '-statistics.recommend_count').skip(0).limit(30)
     data = []
     for o in objs:
         item = activity_user_data(o, token['id'])
@@ -200,11 +202,79 @@ def attend(token):
     return result_success('推荐活动成功')
 
 
+# 参加活动 添加到活动态
+@app.route("/activity/attend/dynamic", methods=["GET", "POST"])
+@filter_exception
+@filter_token
+def attend_dynamic(token):
+    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
+    pic_array = []
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
+            if pic_path is None:
+                return result_fail('上传图片错误')
+            pic_array.append(pic_path)
+
+    if is_friend == 'true':
+        is_friend = True
+    if is_city == 'true':
+        is_city = True
+
+    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
+                            activity_state__active_type=2).first()
+    if obj is not None:
+        return result_fail('已经参加过该活动')
+    # 构建推荐对像
+    activity = Activity(id=aid)
+    activity_state = ActivityState(active_type=2, object_id=ObjectId(), content=content, pics=pic_array,
+                                   activity=activity, is_city=is_city, is_friend=is_friend)
+    # 推荐到活动态
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+    # 添加活动添加数
+    Activity.objects(id=aid).update(inc__statistics__attend_count=1)
+    return result_success('推荐活动成功')
+
+
 # 推荐活动
 @app.route("/activity/recommend", methods=["GET", "POST"])
 @filter_exception
 @filter_token
 def recommend(token):
+    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
+    pic_array = []
+    if pics is not None:
+        for pic in pics.split('|'):
+            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
+            if pic_path is None:
+                return result_fail('上传图片错误')
+            pic_array.append(pic_path)
+
+    if is_friend == 'true':
+        is_friend = True
+    if is_city == 'true':
+        is_city = True
+
+    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
+                            activity_state__active_type=1).first()
+    if obj is not None:
+        return result_fail('已经推荐过该活动')
+    # 构建推荐对像
+    activity = Activity(id=aid)
+    activity_state = ActivityState(active_type=1, object_id=ObjectId(), content=content, pics=pic_array,
+                                   activity=activity, is_city=is_city, is_friend=is_friend)
+    # 推荐到活动态
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+    # 添加活动添加数
+    Activity.objects(id=aid).update(inc__statistics__recommend_count=1)
+    return result_success('推荐活动成功')
+
+
+# 推荐活动 添加到活动态
+@app.route("/activity/recommend/dynamic", methods=["GET", "POST"])
+@filter_exception
+@filter_token
+def recommend_dynamic(token):
     is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
     pic_array = []
     if pics is not None:
@@ -254,21 +324,23 @@ def activity_collect(token):
         return result_success('取消收藏成功')
 
 
-# 发布活动
+# 发布活动      ---------------》（添加测试数据用的，不准确的）
 @app.route("/activity/issue", methods=['get'])
 def issue():
     type = request.args.get("type")
 
     address = Address(longtitude='120.208261', latitude='30.247119', address='zhong yue', city_id=1)
-    ticket1 = ActivityTicket(name='贵宾票', inventory=20, description='5月20日 周杰伦盛大演出', price=1000, is_entity=True)
-    ticket2 = ActivityTicket(name='普通票', inventory=20, description='5月20日 周杰伦盛大演出', price=200, is_entity=True)
+    ticket1 = ActivityTicket(name='贵宾票', inventory=20, description='5月20日 周杰伦盛大演出', price=1000)
+    ticket2 = ActivityTicket(name='普通票', inventory=20, description='5月20日 周杰伦盛大演出', price=200)
+
+    ticket_into = TicketInfo(is_entity=False, contact_phone="", contact_xp_account="", tickets=[ticket1, ticket2])
     if type is None:
         creator_info = ActivityCreator(name='咕噜米', pic='1.jpg', id=1, creator_type=2)
-        Activity(title="z这是  03-05 的 活动", address=address, poster='img/1.png', hx_group_id='123456789',
+        Activity(title="杭州体育馆，杰伦演唱会", address=address, poster='/static/imgs/activity/1.jpeg', hx_group_id='123456789',
                  labels=['旅游', '沙发'],
                  begin_time=datetime.datetime.now() + datetime.timedelta(4),
                  end_time=datetime.datetime.now() + datetime.timedelta(5),
-                 creator_info=creator_info, tickets=[ticket1, ticket2], is_free=True, cast_much='20').save()
+                 creator_info=creator_info, ticket_info=ticket_into, is_free=False, cast_much='20~100').save()
     else:
         creator_info = ActivityCreator(name='咕噜米', pic='1.jpg', id=2, creator_type=1)
         Activity(title="这是  03-09 的 活动", address=address, pics=['1.jpg'], hx_group_id='123456789',
@@ -277,7 +349,49 @@ def issue():
     return 'ok'
 
 
-# 获取标签及标签活动
+# 网站上发布活动到mongo      ---------------》（添加测试数据用的，不准确的）
+@app.route("/activity/issue/web", methods=['post', 'get'])
+def issue_web():
+    data = request_all_values('data')
+    json_data = json.loads(data)
+    labels = json_data['LabelNames'].split(' ')[0:len(json_data['LabelNames'].split(' ')) - 1]
+    address = Address(longtitude=json_data['Address']['Log'], latitude=json_data['Address']['Lat'],
+                      address=json_data['Address']['Address'], city_id=1)
+    tickets = []
+
+    cast_much = []
+
+    for i in range(0, len(json_data['Ticket']['Tickets'])):
+        ticket = ActivityTicket(name=json_data['Ticket']['Tickets'][i]['Name'],
+                                inventory=json_data['Ticket']['Tickets'][i]['Num'],
+                                description=json_data['Ticket']['Tickets'][i]['Des'],
+                                price=json_data['Ticket']['Tickets'][i]['Price'])
+        cast_much.append(float(json_data['Ticket']['Tickets'][i]['Price']))
+        tickets.append(ticket)
+
+    is_free = False if cast_much[len(cast_much) - 1] > 0 else True
+    much_str = '免费' if cast_much[len(cast_much) - 1] == 0 else str(cast_much[0]) + '~' + str(
+            cast_much[len(cast_much) - 1])
+
+    ticket_into = TicketInfo(is_entity=json_data['Ticket']['IsEntityTicket'],
+                             contact_phone=json_data['Ticket']['Contact']['PhoneNum'],
+                             contact_xp_account=json_data['Ticket']['Contact']['XpNum'], tickets=tickets)
+    creator_info = ActivityCreator(name='咕噜米', pic='/static/imgs/user/' + str(random.randint(1, 10)) + '.jpeg', id=1,
+                                   creator_type=2)
+
+    Activity(title=json_data['Title'], address=address,
+             poster='/static/imgs/activity/' + str(random.randint(1, 10)) + '.jpeg', hx_group_id='123456789',
+             labels=labels,
+             begin_time=datetime.datetime.strptime(
+                     json_data['Time']['BeginDate'] + ' ' + json_data['Time']['BeginTime'],
+                     "%Y-%m-%d %H:%M"),
+             end_time=datetime.datetime.strptime(json_data['Time']['EndDate'] + ' ' + json_data['Time']['EndTime'],
+                                                 "%Y-%m-%d %H:%M"),
+             creator_info=creator_info, ticket_info=ticket_into, is_free=is_free, cast_much=much_str).save()
+    return result_success('发布成功')
+
+
+# 获取标签及标签活动    -----------------》静态数据（数据不够，后期要完善）
 @app.route("/activity/label", methods=['get'])
 @filter_exception
 @filter_token
@@ -288,7 +402,7 @@ def activity_label(token):
     return result_success('成功', data)
 
 
-# 获取精选活动
+# 获取精选活动     ----------------------》静态数据（目前做不了，后期完善）
 @app.route("/activity/select", methods=['get'])
 @filter_exception
 @filter_token

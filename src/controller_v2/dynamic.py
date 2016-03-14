@@ -1,4 +1,6 @@
 # 活动态  动态
+import datetime
+
 from bson import ObjectId
 
 from data.database.Mongo.DynamicComment import DynamicComment
@@ -12,37 +14,48 @@ from util.token_helper import filter_token
 
 
 # 根据活动态id 获取活动态评论
-def get_comment(dynamic_id):
-    data = []
-    for comment in DynamicComment.objects(dynamic_id=dynamic_id):
-        com = {
+def get_comment_by_id(dynamic_id):
+    comments = []
+    for comment in DynamicComment.objects(dynamic_id=dynamic_id).order_by('-add_time'):
+        data = {
             'id': str(comment.id),
-            'my_name': comment.ori_user.info.nickname,
-            'my_pic': comment.ori_user.info.pic,
-            'obj_name': comment.obj_user.info.nickname if False else '',
-            'content': comment.content,
-            'add_time': time_to_stamp(comment.add_time)
+            'ori_uid': comment.ori_user.mysql_id,
+            'ori_pic': comment.ori_user.info.pic,
+            'ori_nickname': comment.ori_user.info.nickname,
+            'obj_uid': comment.obj_user.mysql_id if comment.obj_user.id != 0 else 0,
+            'obj_nickname': comment.obj_user.info.nickname if comment.obj_user.id != 0 else '',
+            'add_time': time_to_stamp(comment.add_time),
+            'content': comment.content
         }
-        data.append(com)
-    return data
+        comments.append(data)
+    return comments
 
 
 # 根据用户点赞数组，获取活动态点赞信息
 def get_raise(raise_array, uid):
     is_raise = False
     pics = []
+
+    data = {'num': 0, 'is_raise': False, 'pics': []}
     length = len(raise_array)
+    if length == 0:
+        return data
     for i in range(0, length):
-        if i < 10:
-            pics.append(raise_array[i].info.pic)
         if raise_array[i].mysql_id == uid:
             is_raise = True
+            if i > 0:
+                pics[0] = raise_array[i].info.pic
+            else:
+                pics.append(raise_array[0].info.pic)
+        else:
+            if i < 10:
+                pics.append(raise_array[i].info.pic)
     return {'num': length, 'is_raise': is_raise, 'pics': pics}
 
 
 # 获取活动态数据分页(查看自己和好友的)
 @app.route("/dynamic", methods=['GET'])
-@filter_exception
+# @filter_exception
 @filter_token
 def dynamic(token):
     page_index, page_size = request_all_values('page_index', 'page_size')
@@ -69,7 +82,7 @@ def dynamic(token):
                     'pics': dynamic.pics,
                     'add_time': time_to_stamp(dynamic.add_time),
                     'type': dynamic.active_type,
-                    'comments': {'num': 12, 'content': '我的评论，这是假数据'},
+                    'comments': {'num': 12 if i % 2 == 0 else 0, 'content': '我的评论，这是假数据' if i % 2 == 0 else ''},
                     'interrupt': {'content': dynamic.interrupt.content if dynamic.interrupt is not None else '',
                                   'add_time': time_to_stamp(
                                           dynamic.interrupt.add_time) if dynamic.interrupt is not None else '',
@@ -159,22 +172,26 @@ def add_raise(token):
 
 
 # 添加评论
-@app.route("/dynamic/comment/post", methods=['get', 'POST'])
+@app.route("/dynamic/comment/post", methods=['POST', 'GET'])
 @filter_exception
 @filter_token
 def add_comment(token):
     obj_uid, dynamic_uid, dynamic_id, content = request_all_values('obj_uid', 'dynamic_uid', 'dynamic_id', 'content')
     ori_user = MongoUser(mysql_id=token['id'])
     obj_user = MongoUser(mysql_id=obj_uid)
-    DynamicComment(dynamic_id=ObjectId(dynamic_id), content=content, ori_user=ori_user, obj_user=obj_user).save()
+    # 添加评论
+    DynamicComment(dynamic_id=ObjectId(dynamic_id), content=content, ori_user=ori_user, obj_user=obj_user, add_time=datetime.datetime.now()).save()
+    # 应他们要求，返回全部评论（肯定是不好的）
+    comments = get_comment_by_id(dynamic_id)
+    # 添加活动态消息提示
     message_info = MessageInfo(user=ori_user, type=4)
     if int(dynamic_uid) != token['id']:
         MongoUser.objects(activity_state__object_id=ObjectId(dynamic_id)).update(add_to_set__message_info=message_info)
-    return result_success('添加成功')
+    return result_success('添加成功', comments)
 
 
 # 删除评论
-@app.route("/dynamic/comment", methods=['DELETE'])
+@app.route("/dynamic/comment/delete", methods=['DELETE', 'GET'])
 @filter_exception
 @filter_token
 def delete_comment(token):
@@ -184,23 +201,14 @@ def delete_comment(token):
 
 
 # 获取评论
-@app.route("/dynamic/comment", methods=['GET'])
+@app.route("/dynamic/comment/get", methods=['GET', 'GET'])
 @filter_exception
 @filter_token
 def get_comment(token):
     dynamic_id = request_all_values('dynamic_id')
-    comments = []
-    for comment in DynamicComment.objects(dynamic_id=dynamic_id):
-        data = {
-            'ori_uid': comment.ori_user.mysql_id,
-            'ori_pic': comment.ori_user.info.pic,
-            'ori_nickname': comment.ori_user.info.nickname,
-            'obj_uid': comment.obj_user.mysql_id if comment.obj_user.id != 0 else 0,
-            'obj_nickname': comment.obj_user.info.nickname if comment.obj_user.id != 0 else '',
-            'add_time': time_to_stamp(comment.add_time),
-            'content': comment.content
-        }
-        comments.append(data)
+
+    comments = get_comment_by_id(dynamic_id)
+
     return result_success('成功', comments)
 
 

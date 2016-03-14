@@ -17,7 +17,13 @@ class ActivityTicket(EmbeddedDocument):
     inventory = IntField(required=True)
     description = StringField(required=True)
     price = DecimalField(required=True, default=0.0)
+
+
+class TicketInfo(EmbeddedDocument):
     is_entity = BooleanField(required=True, default=True)
+    contact_phone = StringField()
+    contact_xp_account = StringField()
+    tickets = ListField(EmbeddedDocumentField(ActivityTicket))
 
 
 class ActivityCreator(EmbeddedDocument):
@@ -40,7 +46,7 @@ class Activity(mongo.Document):
     address = EmbeddedDocumentField(Address, required=True)
     poster = StringField()
     pics = ListField(StringField())
-    tickets = ListField(EmbeddedDocumentField(ActivityTicket))
+    ticket_info = EmbeddedDocumentField(TicketInfo)
     hx_group_id = StringField(max_length=18, required=True)
     labels = ListField(StringField(), required=True)
     begin_time = DateTimeField()

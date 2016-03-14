@@ -52,6 +52,12 @@
             list-style: none;
             padding: 2px 2px 2px 2px;
         }
+        .my_nav{
+            padding: 10px;
+            width: 600px;
+            margin: auto;
+            border: 1px solid silver;
+        }
         .my_nav span
         {
             cursor: pointer;
@@ -63,6 +69,14 @@
             font-size: 30px;
             font-weight:900;
             padding: 50px 10px;
+            color: red;
+        }
+        .introduce{
+            padding: 15px;
+            width: 320px;
+            margin: auto;
+        }
+        .introduce span{
             color: red;
         }
     </style>
@@ -89,9 +103,12 @@
 
 <body>
 
-    <div class="container">
-        <div  style="margin-bottom: 30px"><span>说明：双击，回到顶部导航栏</span></div>
+    <div class="container" style="margin-top: 10px">
         <div class="my_nav " style="margin: 0 auto">
+            <div class="introduce">
+                <span>说明：双击，回到顶部导航栏</span>
+                <span>所有接口列表</span>
+            </div>
             <ul>
                 <li>
                     <div>
@@ -100,6 +117,11 @@
                     <ul>
                         <li><a href="#user_register">用户注册</a></li>
                         <li><a href="#user_login_pass">用户登陆(通过密码)</a></li>
+                        <li><a href="#user_login_code">用户登陆(通过手机验证码)</a></li>
+                        <li><a href="#user_account">修改注册账号</a></li>
+                        <li><a href="#user_password_pass">通过原始密码修改密码</a></li>
+                        <li><a href="#user_password_code">通过验证码修改密码</a></li>
+                        <li><a href="#user_protect">设置账户保护</a></li>
                         <li><a href="#user_activity">发布个人活动</a></li>
                         <li><a href="#user_dynamic">发布个人动态</a></li>
 
@@ -274,6 +296,296 @@
                             <tr>
                                 <td>password</td>
                                 <td>用户密码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>device_id</td>
+                                <td>设备唯一id</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_login_code">
+                        <header class="text-center"><h1>用户登陆（通过手机验证码）</h1></header>
+                        <div>
+                            <h3>接口地址：/user/login/code</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>phone</td>
+                                <td>用户注册号（手机号码）</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>code</td>
+                                <td>手机验证码</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_account">
+                        <header class="text-center"><h1>修改注册账号</h1></header>
+                        <div>
+                            <h3>接口地址：/user/account</h3>
+                            <h4 >请求方式：<i class="red">PUT</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td></td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>phone</td>
+                                <td>新的手机号码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>code</td>
+                                <td>手机验证码</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_password_pass">
+                        <header class="text-center"><h1>通过原始密码修改密码</h1></header>
+                        <div>
+                            <h3>接口地址：user/password/pass</h3>
+                            <h4 >请求方式：<i class="red">PUT</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td></td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>origin_pass</td>
+                                <td>原始密码</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>new_pass</td>
+                                <td>新密码</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_password_code">
+                        <header class="text-center"><h1>通过验证码修改密码</h1></header>
+                        <div>
+                            <h3>接口地址：user/password/code</h3>
+                            <h4 >请求方式：<i class="red">PUT</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td></td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>new_pass</td>
+                                <td>新密码</td>
+                                <td>是</td>
+                            </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": {
+                                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoeF9hY2NvdW50IjoiMTU3NTcwNDg5NjEiLCJpZCI6MjIyLCJwYXN0X3RpbWUiOjE0NjEzNzg1MjcuMH0.gQe_z2LcD5CaDotWE8MZ2vKk_9LAd4JM2NaU7lDXQ7I",
+                                "user_info": {
+                                  "city": "leping",
+                                  "device_id": "",
+                                  "hx_account": "15757048961",
+                                  "hx_password": "$2b$12$jvo0IvjM/.0W6Vxbv7.KseLwF2AjWUrpW/RVPqUcgmrVsSkffzjIW",
+                                  "is_protect": false,
+                                  "is_verify": false,
+                                  "nickname": "12zxdczx3",
+                                  "pic": "/imgs/user/f37783c0-c95b-11e5-93fa-fcaa1499c97b.jpg",
+                                  "province": "jiangxi",
+                                  "sex": true,
+                                  "signature": "",
+                                  "user_origin": 1
+                                }
+                              },
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="user_protect">
+                        <header class="text-center"><h1>设置账户保护</h1></header>
+                        <div>
+                            <h3>接口地址：/user/protect</h3>
+                            <h4 >请求方式：<i class="red">PUT</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数:空</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td></td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>type</td>
+                                <td>1=设置保护   0=取消保护</td>
                                 <td>是</td>
                             </tr>
                             <tr>
@@ -736,7 +1048,7 @@
                     <li id="dynamic_comment_add">
                         <header class="text-center"><h1>添加评论</h1></header>
                         <div>
-                            <h3>接口地址：/dynamic/comment</h3>
+                            <h3>接口地址：/dynamic/comment/post</h3>
                             <h4 >请求方式：<i class="red">POST</i></h4>
                         </div>
                         <table class="table table-hover table-bordered">
@@ -754,6 +1066,11 @@
                             <tr>
                                 <th>dynamic_id</th>
                                 <th>活动态id</th>
+                                <th>是</th>
+                            </tr>
+                            <tr>
+                                <th>dynamic_uid</th>
+                                <th>该活动态所属人uid</th>
                                 <th>是</th>
                             </tr>
                             <tr>
@@ -781,7 +1098,7 @@
                     <li id="dynamic_comment_delete">
                         <header class="text-center"><h1>删除评论</h1></header>
                         <div>
-                            <h3>接口地址：/dynamic/comment</h3>
+                            <h3>接口地址：/dynamic/comment/delete</h3>
                             <h4 >请求方式：<i class="red">DELETE</i></h4>
                         </div>
                         <table class="table table-hover table-bordered">
@@ -816,7 +1133,7 @@
                     <li id="dynamic_comment_get">
                         <header class="text-center"><h1>获取评论</h1></header>
                         <div>
-                            <h3>接口地址：/dynamic/comment</h3>
+                            <h3>接口地址：/dynamic/comment/get</h3>
                             <h4 >请求方式：<i class="red">GET</i></h4>
                         </div>
                         <table class="table table-hover table-bordered">

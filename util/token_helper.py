@@ -46,7 +46,7 @@ def make_token(user_id):
 def filter_token(func):
     @wraps(func)
     def _filter_token():
-        if request.method == 'GET':
+        if request.method == 'GET' or request.method == 'DELETE':
             token = request.args.get('token')
         else:
             token = request.form.get('token')

@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script type="text/javascript">
-       function validateIt(inputelement){
-           if(inputelement.validity.patternMismatch){
-               inputelement.setCustomValidity('只许输入字母');
-           }else {
-               inputelement.setCustomValidity('f')
-           }
-           return true
-       }
+        function Student(props){
+            this.name = props.name || 'Unnamed';
+        }
+        Student.prototype.hello = function(){
+            alert('Hello,' + this.name)
+        }
+
+        function PrimaryStudent(props){
+            Student.call(this,props);
+            this.grade=props.grade || 1;
+        }
+        function F(){}
+
+        F.prototype=Student.prototype
+        PrimaryStudent.prototype=new F()
+        PrimaryStudent.prototype.constructor=PrimaryStudent;
+        PrimaryStudent.prototype.getGrade=function(){
+            return this.grade
+        }
+
+
     </script>
 </head>
 <body>
-<form action="">
-    <input type="text" pattern="[a-z]" oninvalid="validateIt(this)" onchange="validateIt(this)" oninput="validateIt(this)">
-    <input type="submit">
-</form>
+
 </body>
 </html>

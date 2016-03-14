@@ -53,7 +53,7 @@ def request_required(*args_name):
 def request_all_values(*args_name):
     values = []
     length = len(args_name)
-    if request.method == 'GET':
+    if request.method == 'GET'or request.method == 'DELETE':
         for name in args_name:
             if length == 1:
                 return request.args.get(name)
@@ -61,8 +61,9 @@ def request_all_values(*args_name):
     else:
         for name in args_name:
             if length == 1:
-                return request.args.get(name)
+                return request.form.get(name)
             values.append(request.form.get(name))
+    print(args_name,values)
     return values
 
 # 返回int 类型必填参数

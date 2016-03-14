@@ -1,4 +1,6 @@
 import datetime
+import json
+import random
 from encodings.utf_8 import encode
 from functools import wraps
 
@@ -99,9 +101,6 @@ def img_test(pics, length=140):
     return border, position
 
 
-
-
-
 def clipimage(size):
     width = int(size[0])
     height = int(size[1])
@@ -119,7 +118,7 @@ def clipimage(size):
 def dd():
     # user = MongoUser(mysql_id=229)
     # DynamicComment(dynamic_id=ObjectId(), content='tou nsn',com_uid=user,obj_uid=user).save()
-    d =DynamicComment.objects(dynamic_id='56d2a3cc94a7c05075c171f9').first()
+    d = DynamicComment.objects(dynamic_id='56d2a3cc94a7c05075c171f9').first()
     print(d.com_uid)
     return 'ok'
 
@@ -190,11 +189,25 @@ def test3():
     return render_template('js.html')
 
 
+@app.route("/test4")
 def test4():
-    a=[1,3,4]
+    print('%s ni shenm %s' % ('sdf', '11111'))
+    return 'sdfs'
 
-    a.append(5)
-    return a
+
+@app.route("/test5", methods=['post', 'get'])
+def test5():
+    d = []
+    dd = [15, 12, 3, 4, 6, 7, 8, 9, 13, 23, 33,5,67,89,4,42]
+    for i in range(0, len(dd)):
+        if i == 15:
+            d[0] = 15
+        else:
+            if i < 10:
+                d.append(dd[i])
+
+    print(d)
+    return 'ok'
 
 
 def test():
