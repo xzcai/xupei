@@ -147,7 +147,7 @@ def add_interrupt(token):
     return result_success('成功')
 
 
-# 点赞，取消点赞
+# 点赞，取消点赞 d
 @app.route("/dynamic/raise", methods=['GET', 'POST'])
 @filter_exception
 @filter_token
