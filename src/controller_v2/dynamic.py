@@ -13,7 +13,7 @@ from util.time_helper import time_to_stamp
 from util.token_helper import filter_token
 
 
-# 根据活动态id 获取活动态评论
+# 根据活动态id 获取活动态评论  d 
 def get_comment_by_id(dynamic_id):
     comments = []
     for comment in DynamicComment.objects(dynamic_id=dynamic_id).order_by('-add_time'):
