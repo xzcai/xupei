@@ -197,16 +197,15 @@ def test4():
 
 @app.route("/test5", methods=['post', 'get'])
 def test5():
-    d = []
-    dd = [15, 12, 3, 4, 6, 7, 8, 9, 13, 23, 33,5,67,89,4,42]
-    for i in range(0, len(dd)):
-        if i == 15:
-            d[0] = 15
-        else:
-            if i < 10:
-                d.append(dd[i])
+    print(datetime.datetime.now())
 
-    print(d)
+    date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(date_str)
+    time_array = time.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    print(time_array.tm_year)
+    print(time_array)
+
+    return str(time_array.tm_mon) + '月' + str(time_array.tm_mday) + '日'
     return 'ok'
 
 

@@ -9,6 +9,7 @@ from data.database.Mongo.Activity import Activity, Address, ActivityCreator, Act
 from data.database.Mongo.MongoUser import MongoUser, ActivityState
 from src import app
 from src.bll.activity_bll import is_collection
+from src.helper.activity import time_transform
 from util.calculate_distance import calc_distance
 from util.decorator_helper import filter_exception
 from util.image_helper import ImageHelper, PicType
@@ -21,16 +22,20 @@ from util.token_helper import filter_token
 
 # 活动属性排序
 def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, latitude=None):
+    size = int(page_size)
+    start = (int(page_index) - 1) * size
+    print(size, start, page_index, page_size)
+
     if sort_attribute == Activity_Attribute.hot:
-        objs = Activity.objects(where).order_by('-statistics.attend_count')
+        objs = Activity.objects(where).order_by('-statistics.attend_count')[start:start + size]
     elif sort_attribute == Activity_Attribute.recommend:
-        objs = Activity.objects(where).order_by('-statistics.recommend_count')
+        objs = Activity.objects(where).order_by('-statistics.recommend_count')[start:start + size]
     elif sort_attribute == Activity_Attribute.free:
         where = where & Q(is_free=True)
-        objs = Activity.objects(where).order_by('create_time')
+        objs = Activity.objects(where).order_by('create_time')[start:start + size]
     elif sort_attribute == Activity_Attribute.near:
         print(longitude, latitude)
-        objs = Activity.objects(where)
+        objs = Activity.objects(where)[start:start + size]
         data = []
         for o in objs:
             o.distance = calc_distance(float(latitude), float(longitude), float(o.address.latitude),
@@ -40,14 +45,11 @@ def activity_sort(sort_attribute, where, page_index, page_size, longitude=None, 
         return sorted(data, key=lambda x: x['distance'])
 
     elif sort_attribute == Activity_Attribute.select:
-        objs = Activity.objects(where).order_by('create_time')
+        objs = Activity.objects(where).order_by('create_time')[start:start + size]
     else:
-        objs = Activity.objects(where).order_by('create_time')
+        objs = Activity.objects(where).order_by('create_time').skip(start).limit(size)
 
-    size = int(page_size)
-    num = (int(page_index) - 1) * size
     return objs
-    return objs.skip(num).limit(size)
 
 
 # 整合数据，去除无用数据
@@ -58,6 +60,7 @@ def activity_user_data(activity, user_id):
             'pics': activity.pics,
             'creator_name': activity.creator_info.name,
             'creator_pic': activity.creator_info.pic,
+            'creator_id': activity.creator_info.id,
             'recommend_count': activity.statistics.recommend_count,
             'attend_count': activity.statistics.attend_count,
             'title': activity.title,
@@ -74,11 +77,12 @@ def activity_user_data(activity, user_id):
             'cast_much': activity.cast_much,
             'creator_name': activity.creator_info.name,
             'creator_pic': activity.creator_info.pic,
+            'creator_id': activity.creator_info.id,
             'recommend_count': activity.statistics.recommend_count,
             'attend_count': activity.statistics.attend_count,
             'title': activity.title,
             'address': activity.address.address,
-            'begin_time': time_to_stamp(activity.begin_time),
+            'time': time_transform(activity.begin_time, activity.end_time),
             'labels': activity.labels,
             'is_collection': is_collection(user_id, activity.id),
         }
@@ -101,8 +105,7 @@ def activity_sponsor(token):
     if label:
         where = where & Q(labels=label)
     if date:
-        where = where & Q(begin_time__gte=stamp_to_time(date)) & Q(
-                begin_time__lt=stamp_to_time(date) + datetime.timedelta(1))
+        where = where & Q(begin_time__lte=stamp_to_time(date, True)) & Q(end_time__gte=stamp_to_time(date, True))
     if attribute is not None:
         objs = activity_sort(attribute, where, page_index, page_size, longitude, latitude)
     # 首页
@@ -139,10 +142,9 @@ def activity_queue(token):
         where = where & Q(labels=label)
     if date:
         begin_time = stamp_to_time(date)
-        where = where & Q(queue_begin_time__gte=begin_time) & Q(
-                queue_begin_time__lt=begin_time + datetime.timedelta(1))
+        where = where & Q(queue_begin_time__gte=begin_time) & Q(queue_begin_time__lt=begin_time + datetime.timedelta(1))
 
-    objs = activity_sort(attribute, where, page_size, page_index, longitude, latitude)
+    objs = activity_sort(attribute, where, page_index, page_size, longitude, latitude)
     data = []
     for o in objs:
         item = activity_user_data(o, token['id'])
@@ -370,8 +372,8 @@ def issue_web():
         tickets.append(ticket)
 
     is_free = False if cast_much[len(cast_much) - 1] > 0 else True
-    much_str = '免费' if cast_much[len(cast_much) - 1] == 0 else str(cast_much[0]) + '~' + str(
-            cast_much[len(cast_much) - 1])
+    much_str = '免费' if cast_much[len(cast_much) - 1] == 0 else str(int(cast_much[0])) + '~' + str(
+            int(cast_much[len(cast_much) - 1]))
 
     ticket_into = TicketInfo(is_entity=json_data['Ticket']['IsEntityTicket'],
                              contact_phone=json_data['Ticket']['Contact']['PhoneNum'],

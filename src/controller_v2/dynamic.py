@@ -13,10 +13,10 @@ from util.time_helper import time_to_stamp
 from util.token_helper import filter_token
 
 
-# 根据活动态id 获取活动态评论  d 
+# 根据活动态id 获取活动态评论  d
 def get_comment_by_id(dynamic_id):
     comments = []
-    for comment in DynamicComment.objects(dynamic_id=dynamic_id).order_by('-add_time'):
+    for comment in DynamicComment.objects(dynamic_id=dynamic_id).order_by('add_time'):
         data = {
             'id': str(comment.id),
             'ori_uid': comment.ori_user.mysql_id,
@@ -29,6 +29,18 @@ def get_comment_by_id(dynamic_id):
         }
         comments.append(data)
     return comments
+
+
+# 获取活动态评论信息
+def get_comment_danamic(dynamic_id):
+    data = {'num': 0, 'content': ''}
+
+    comments = get_comment_by_id(dynamic_id)
+    length = len(comments)
+    if length == 0:
+        return data
+    else:
+        return {'num': length, 'content': comments[length-1]['content']}
 
 
 # 根据用户点赞数组，获取活动态点赞信息
@@ -82,7 +94,8 @@ def dynamic(token):
                     'pics': dynamic.pics,
                     'add_time': time_to_stamp(dynamic.add_time),
                     'type': dynamic.active_type,
-                    'comments': {'num': 12 if i % 2 == 0 else 0, 'content': '我的评论，这是假数据' if i % 2 == 0 else ''},
+                    'comments': get_comment_danamic(dynamic.object_id),
+                    # {'num': 12 if i % 2 == 0 else 0, 'content': '我的评论，这是假数据' if i % 2 == 0 else ''},
                     'interrupt': {'content': dynamic.interrupt.content if dynamic.interrupt is not None else '',
                                   'add_time': time_to_stamp(
                                           dynamic.interrupt.add_time) if dynamic.interrupt is not None else '',
@@ -126,6 +139,7 @@ def get_new_info(token):
             'pic': obj.user.info.pic
         }
         data.append(msg)
+    MongoUser.objects(mysql_id=token['id']).update_one(message_info=[])
     return result_success('成功', data)
 
 
@@ -180,7 +194,8 @@ def add_comment(token):
     ori_user = MongoUser(mysql_id=token['id'])
     obj_user = MongoUser(mysql_id=obj_uid)
     # 添加评论
-    DynamicComment(dynamic_id=ObjectId(dynamic_id), content=content, ori_user=ori_user, obj_user=obj_user, add_time=datetime.datetime.now()).save()
+    DynamicComment(dynamic_id=ObjectId(dynamic_id), content=content, ori_user=ori_user, obj_user=obj_user,
+                   add_time=datetime.datetime.now()).save()
     # 应他们要求，返回全部评论（肯定是不好的）
     comments = get_comment_by_id(dynamic_id)
     # 添加活动态消息提示

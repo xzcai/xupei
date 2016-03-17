@@ -4,8 +4,6 @@ import bcrypt
 
 from flask.ext.mongoengine import unicode
 
-import jwt
-
 
 def EncryptPass(pwd):
     m2 = md5()

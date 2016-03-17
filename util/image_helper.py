@@ -3,8 +3,6 @@ import uuid
 
 from PIL import Image
 
-from util.result_helper import result_fail
-
 
 class PicType(object):
     # 用户头像 发布动态 发布活动的图片
@@ -86,7 +84,7 @@ class ImageHelper(object):
     def clip_image(size):
         width = int(size[0])
         height = int(size[1])
-        if (width > height):
+        if width > height:
             dx = width - height
             box = (int(dx / 2), 0, int(height + dx / 2), height)
         else:
