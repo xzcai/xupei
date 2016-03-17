@@ -59,7 +59,7 @@ class ActivityState(EmbeddedDocument):
     # 推荐 参加 活动id
     activity = ReferenceField(Activity)
     # 是否城市可见
-    is_city = BooleanField(default=False)
+    city_id = IntField(required=True)
     # 是否好友可见
     is_friend = BooleanField(default=False)
 

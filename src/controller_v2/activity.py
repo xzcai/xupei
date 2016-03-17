@@ -175,33 +175,17 @@ def get_detail(token):
 @filter_exception
 @filter_token
 def attend(token):
-    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
-    pic_array = []
-    if pics is not None:
-        for pic in pics.split('|'):
-            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
-            if pic_path is None:
-                return result_fail('上传图片错误')
-            pic_array.append(pic_path)
+    aid = request_all_values('aid')
 
-    if is_friend == 'true':
-        is_friend = True
-    if is_city == 'true':
-        is_city = True
-
-    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
-                            activity_state__active_type=2).first()
+    obj = MongoUser.objects(mysql_id=token['id'], activity_attend=ObjectId(aid)).first()
     if obj is not None:
         return result_fail('已经参加过该活动')
-    # 构建推荐对像
-    activity = Activity(id=aid)
-    activity_state = ActivityState(active_type=2, object_id=ObjectId(), content=content, pics=pic_array,
-                                   activity=activity, is_city=is_city, is_friend=is_friend)
-    # 推荐到活动态
-    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+
     # 添加活动添加数
     Activity.objects(id=aid).update(inc__statistics__attend_count=1)
-    return result_success('推荐活动成功')
+    # 添加用户参加活动
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_attend=ObjectId(aid))
+    return result_success('参加活动成功')
 
 
 # 参加活动 添加到活动态
@@ -209,7 +193,7 @@ def attend(token):
 @filter_exception
 @filter_token
 def attend_dynamic(token):
-    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
+    city_id, is_friend, content, aid, pics = request_all_values('city_id', 'is_friend', 'content', 'aid', 'pics')
     pic_array = []
     if pics is not None:
         for pic in pics.split('|'):
@@ -220,22 +204,13 @@ def attend_dynamic(token):
 
     if is_friend == 'true':
         is_friend = True
-    if is_city == 'true':
-        is_city = True
-
-    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
-                            activity_state__active_type=2).first()
-    if obj is not None:
-        return result_fail('已经参加过该活动')
     # 构建推荐对像
     activity = Activity(id=aid)
     activity_state = ActivityState(active_type=2, object_id=ObjectId(), content=content, pics=pic_array,
-                                   activity=activity, is_city=is_city, is_friend=is_friend)
+                                   activity=activity, city_id=int(city_id), is_friend=is_friend)
     # 推荐到活动态
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
-    # 添加活动添加数
-    Activity.objects(id=aid).update(inc__statistics__attend_count=1)
-    return result_success('推荐活动成功')
+    return result_success('参加活动成功')
 
 
 # 推荐活动
@@ -243,32 +218,16 @@ def attend_dynamic(token):
 @filter_exception
 @filter_token
 def recommend(token):
-    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
-    pic_array = []
-    if pics is not None:
-        for pic in pics.split('|'):
-            pic_path = ImageHelper.base64_to_image(pic, PicType.dynamic)
-            if pic_path is None:
-                return result_fail('上传图片错误')
-            pic_array.append(pic_path)
+    aid = request_all_values('aid')
 
-    if is_friend == 'true':
-        is_friend = True
-    if is_city == 'true':
-        is_city = True
-
-    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
-                            activity_state__active_type=1).first()
+    obj = MongoUser.objects(mysql_id=token['id'], activity_recommend=ObjectId(aid)).first()
     if obj is not None:
         return result_fail('已经推荐过该活动')
-    # 构建推荐对像
-    activity = Activity(id=aid)
-    activity_state = ActivityState(active_type=1, object_id=ObjectId(), content=content, pics=pic_array,
-                                   activity=activity, is_city=is_city, is_friend=is_friend)
-    # 推荐到活动态
-    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
+
     # 添加活动添加数
     Activity.objects(id=aid).update(inc__statistics__recommend_count=1)
+    # 添加用户推荐活动
+    MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_recommend=ObjectId(aid))
     return result_success('推荐活动成功')
 
 
@@ -277,7 +236,7 @@ def recommend(token):
 @filter_exception
 @filter_token
 def recommend_dynamic(token):
-    is_city, is_friend, content, aid, pics = request_all_values('is_city', 'is_friend', 'content', 'aid', 'pics')
+    city_id, is_friend, content, aid, pics = request_all_values('city_id', 'is_friend', 'content', 'aid', 'pics')
     pic_array = []
     if pics is not None:
         for pic in pics.split('|'):
@@ -288,21 +247,14 @@ def recommend_dynamic(token):
 
     if is_friend == 'true':
         is_friend = True
-    if is_city == 'true':
-        is_city = True
 
-    obj = MongoUser.objects(mysql_id=token['id'], activity_state__activity=ObjectId(aid),
-                            activity_state__active_type=1).first()
-    if obj is not None:
-        return result_fail('已经推荐过该活动')
     # 构建推荐对像
     activity = Activity(id=aid)
     activity_state = ActivityState(active_type=1, object_id=ObjectId(), content=content, pics=pic_array,
-                                   activity=activity, is_city=is_city, is_friend=is_friend)
+                                   activity=activity, city_id=int(city_id), is_friend=is_friend)
     # 推荐到活动态
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
-    # 添加活动添加数
-    Activity.objects(id=aid).update(inc__statistics__recommend_count=1)
+
     return result_success('推荐活动成功')
 
 

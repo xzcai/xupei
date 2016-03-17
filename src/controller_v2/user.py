@@ -212,7 +212,7 @@ def set_xp_account(token):
 @filter_exception
 @filter_token
 def issue_activity(token):
-    is_friend, is_city, content, address, begin_time, pics = request_all_values('is_friend', 'is_city', 'content',
+    is_friend, city_id, content, address, begin_time, pics = request_all_values('is_friend', 'city_id', 'content',
                                                                                 'address', 'begin_time', 'pics')
     pic_array = []
     if pics is not None:
@@ -223,11 +223,9 @@ def issue_activity(token):
             pic_array.append(pic_path)
     if is_friend == 'true':
         is_friend = True
-    if is_city == 'true':
-        is_city = True
 
     activity_state = ActivityState(active_type=3, object_id=ObjectId(), content=content, pics=pic_array,
-                                   address=address, begin_time=begin_time, is_friend=is_friend, is_city=is_city)
+                                   address=address, begin_time=begin_time, is_friend=is_friend, city_id=int(city_id))
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
     return result_success('发布活动成功')
 
@@ -237,12 +235,10 @@ def issue_activity(token):
 @filter_exception
 @filter_token
 def issue_dynamic(token):
-    is_friend, is_city, content, address, log, lat, pics = request_all_values('is_friend', 'is_city', 'content',
+    is_friend, city_id, content, address, log, lat, pics = request_all_values('is_friend', 'city_id', 'content',
                                                                               'address', 'log', 'lat', 'pics')
     if is_friend == 'true':
         is_friend = True
-    if is_city == 'true':
-        is_city = True
 
     pic_array = []
     if pics is not None:
@@ -254,6 +250,6 @@ def issue_dynamic(token):
 
     activity_state = ActivityState(active_type=4, object_id=ObjectId(), content=content, pics=pic_array,
                                    address=address,
-                                   longitude=log, latitude=lat, is_friend=is_friend, is_city=is_city)
+                                   longitude=log, latitude=lat, is_friend=is_friend, city_id=int(city_id))
     MongoUser.objects(mysql_id=token['id']).update_one(add_to_set__activity_state=activity_state)
     return result_success('发布动态成功')
