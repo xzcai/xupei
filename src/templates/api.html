@@ -81,6 +81,7 @@
         }
     </style>
     <script type="text/javascript">
+        window.addEventListener()
         $(function(){
             var span = $('.my_nav span')
             span.click(function(){
@@ -155,7 +156,9 @@
                         <li><a href="#activity_queue">获取队列活动</a></li>
                         <li><a href="#activity_collect">活动收藏和取消收藏</a></li>
                         <li><a href="#activity_recommend">推荐活动</a></li>
+                        <li><a href="#activity_recommend_dynamic">推荐活动 到活动态</a></li>
                         <li><a href="#activity_attend">参加活动</a></li>
+                        <li><a href="#activity_attend_dynamic">参加活动 到活动态</a></li>
                         <li><a href="#activity_label">活动首页，获取标签及标签活动数</a></li>
                         <li><a href="#activity_select">活动首页，获取精选活动</a></li>
                     </ul>
@@ -670,8 +673,8 @@
                                 <th>是</th>
                             </tr>
                             <tr>
-                                <td>is_city</td>
-                                <td>是否城市可见</td>
+                                <td>city_id</td>
+                                <td>城市id</td>
                                 <td>是</td>
                             </tr>
                         </table>
@@ -735,8 +738,8 @@
                                 <th>是</th>
                             </tr>
                             <tr>
-                                <td>is_city</td>
-                                <td>是否城市可见</td>
+                                <td>city_id</td>
+                                <td>城市id</td>
                                 <td>是</td>
                             </tr>
                         </table>
@@ -1440,6 +1443,45 @@
                                 <td>活动id</td>
                                 <td>是</td>
                             </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [],
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_recommend_dynamic">
+                        <header class="text-center"><h1>活动推荐 到活动态</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/recommend/dynamic</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>aid</td>
+                                <td>活动id</td>
+                                <td>是</td>
+                            </tr>
                             <tr>
                                 <td>content</td>
                                 <td>内容</td>
@@ -1451,8 +1493,8 @@
                                 <td>否</td>
                             </tr>
                             <tr>
-                                <td>is_city</td>
-                                <td>是否城市可见：是=true；fou=false</td>
+                                <td>city_id</td>
+                                <td>城市id</td>
                                 <td>（和is_friend必填一）</td>
                             </tr>
                             <tr>
@@ -1499,6 +1541,45 @@
                                 <td>活动id</td>
                                 <td>是</td>
                             </tr>
+                        </table>
+                        <hr >
+                        <div>
+                            <h4 >返回格式：<i class="red">JSON</i></h4>
+                        </div>
+                        <div>
+                            <h4>返回示例</h4>
+                        <pre>
+                            {
+                              "data": [],
+                              "msg": "\u6210\u529f",
+                              "status": true
+                            }
+                        </pre>
+                        </div>
+                    </li>
+                    <li id="activity_attend_dynamic">
+                        <header class="text-center"><h1>活动参加 到活动态</h1></header>
+                        <div>
+                            <h3>接口地址：/activity/attend/dynamic</h3>
+                            <h4 >请求方式：<i class="red">POST</i></h4>
+                        </div>
+                        <table class="table table-hover table-bordered">
+                            <caption>请求参数</caption>
+                            <tr>
+                                <th>参数名</th>
+                                <th>说明</th>
+                                <th>是否必填</th>
+                            </tr>
+                            <tr>
+                                <td>token</td>
+                                <td>唯一token</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>aid</td>
+                                <td>活动id</td>
+                                <td>是</td>
+                            </tr>
                             <tr>
                                 <td>content</td>
                                 <td>内容</td>
@@ -1510,8 +1591,8 @@
                                 <td>否</td>
                             </tr>
                             <tr>
-                                <td>is_city</td>
-                                <td>是否城市可见：是=true；fou=false</td>
+                                <td>city_id</td>
+                                <td>城市id</td>
                                 <td>（和is_friend必填一）</td>
                             </tr>
                             <tr>

@@ -44,8 +44,8 @@ class ActivityStatistics(EmbeddedDocument):
 class Activity(mongo.Document):
     title = StringField(max_length=100, required=True)
     address = EmbeddedDocumentField(Address, required=True)
-    poster = StringField()
-    pics = ListField(StringField())
+    poster = StringField()   # 主办方
+    pics = ListField(StringField())  # 队列
     ticket_info = EmbeddedDocumentField(TicketInfo)
     hx_group_id = StringField(max_length=18, required=True)
     labels = ListField(StringField(), required=True)
